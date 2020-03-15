@@ -25,5 +25,11 @@ run-client:
 test:
 	./test
 	./bench
+	./personal
     (sleep 5; run-client) &
     (cd ../src; run-server) 
+
+valgrind:
+	valgrind ./test
+	valgrind ./bench
+	valgrind ./personal	

@@ -2,9 +2,7 @@
 
 
 ## Introduction
-
 where we give a high-level description of the eau2 system.
-
 EAU2 is a distributed key value system to process queries in a big data setting. This can be loosely compared to a very basic hadoop architecture without most of the conveniences of the hadoop api. EAU2 is based around an API to abstract and manage a distributed key value store to manage large scale data. 
 
 

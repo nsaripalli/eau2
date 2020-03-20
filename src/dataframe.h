@@ -25,7 +25,7 @@ class DataFrame : public Object {
 public:
 
     ColumnArray* columns;
-    Schema* schema;
+    Schema* schema; // owned
 
     /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
     DataFrame(DataFrame& df) : DataFrame(*df.schema) {
@@ -37,12 +37,13 @@ public:
             delete this->columns->get(i);
         }
         delete columns;
+        delete schema;
     }
 
     /** Create a data frame from a schema and columns. All columns are created
       * empty. */
     DataFrame(Schema& schema) {
-        this->schema = &schema;
+        this->schema = new Schema(schema);
         this->columns = new ColumnArray();
 
         for (int i = 0; i < this->schema->width(); i++) {
@@ -267,5 +268,14 @@ public:
             curr_row->visit(row_idx, *print);
             delete curr_row;
         }
+    }
+
+    static DataFrame* fromFloatArray(Key* key, KVStore* kv, size_t SZ, float* vals) {
+        Schema s = Schema("f");
+        DataFrame* df = new DataFrame(s);
+        for (size_t i = 0; i < SZ; i++) {
+            df->set(0, i, vals[i]);
+        }
+        return df;
     }
 };

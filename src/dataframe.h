@@ -322,6 +322,7 @@ public:
             df->set(0, i, vals[i]);
         }
         delete s;
+        kv->put(key, df);
         return df;
     }
 
@@ -335,6 +336,7 @@ public:
             df->set(0, i, vals[i]);
         }
         delete s;
+        kv->put(key, df);
         return df;
     }
 
@@ -348,6 +350,7 @@ public:
             df->set(0, i, vals[i]);
         }
         delete s;
+        kv->put(key, df);
         return df;
     }
 
@@ -361,6 +364,7 @@ public:
             df->set(0, i, vals[i]);
         }
         delete s;
+        kv->put(key, df);
         return df;
     }
 };

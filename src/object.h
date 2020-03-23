@@ -1,4 +1,5 @@
 #pragma once
+
 #include "helper.h"
 // LANGUAGE: CwC
 

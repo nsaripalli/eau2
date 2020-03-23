@@ -3,6 +3,7 @@ build:
 	g++ -o client -std=c++11 -Wall -g tests/client.cpp -lpthread
 	g++ -o bench -std=c++11 -Wall -g tests/bench.cpp -lpthread
 	g++ -o test -std=c++11 -Wall -g tests/testing.cpp -lpthread
+	g++ -o app -std=c++11 -Wall -g tests/application_test.cpp -lpthread
 	g++ -o personal -std=c++11 -Wall -g tests/personal_test_suite.cpp -lpthread
 
 run-server: 
@@ -26,6 +27,7 @@ test:
 	./test
 	./bench
 	./personal
+	./app
     (sleep 5; run-client) &
     (cd ../src; run-server) 
 
@@ -33,3 +35,4 @@ valgrind:
 	valgrind ./test
 	valgrind ./bench
 	valgrind ./personal	
+	valgrind ./app

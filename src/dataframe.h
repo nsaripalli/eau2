@@ -316,7 +316,7 @@ public:
      * Takes a Float Array and creates a new one column dataframe.
     **/
     static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, float* vals) {
-        Schema *s = new Schema("f");
+        Schema *s = new Schema("F");
         DataFrame* df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
@@ -329,7 +329,7 @@ public:
      * Takes an int Array and creates a new one column dataframe.
     **/
     static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, int* vals) {
-        Schema *s = new Schema("i");
+        Schema *s = new Schema("I");
         DataFrame* df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
@@ -342,7 +342,7 @@ public:
      * Takes a bool Array and creates a new one column dataframe.
     **/
     static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, bool* vals) {
-        Schema *s = new Schema("b");
+        Schema *s = new Schema("B");
         DataFrame* df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
@@ -355,7 +355,7 @@ public:
      * Takes a String Array and creates a new one column dataframe.
     **/
     static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, String** vals) {
-        Schema *s = new Schema("s");
+        Schema *s = new Schema("S");
         DataFrame* df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);

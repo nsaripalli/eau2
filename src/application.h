@@ -35,15 +35,15 @@ public:
   Trivial(size_t idx) : Application(idx) { assert(idx == 0); } // assumes 0 for M2 TODO
   void run_() {
     size_t SZ = 1000*1000;
-    float* vals = new float[SZ];
-    float sum = 0;
+    int* vals = new int[SZ];
+    int sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
     Key key("triv",0);
     DataFrame* df = DataFrame::fromArray(&key, &kv, SZ, vals);
-    assert(df->get_float(0,1) == 1);
+    assert(df->get_int(0,1) == 1);
     DataFrame* df2 = kv.get(key);
-    for (size_t i = 0; i < SZ; ++i) sum -= df2->get_float(0,i);
+    for (size_t i = 0; i < SZ; ++i) sum -= df2->get_int(0,i);
     assert(sum==0);
-    delete df; delete df2;
+    delete df;
   }
 };

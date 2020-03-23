@@ -36,8 +36,6 @@ For the foreseeable future only strings, numerics (ints and floats), and boolean
 
 ## Use cases
 
-examples of uses of the system. 
-
 This could be in the form of code like the one above. It is okay to leave this section mostly empty if there is nothing to say. Maybe just an example of creating a dataframe would be enough.
 
 Here is an example application. An example use case would be in a datacenter with 3 nodes. There is a producer, counter, and summarizer node running in a distributed setting. The dataframe data is distributed on node 0 in this example, and the other nodes get the data on other nodes via network streams.
@@ -86,16 +84,19 @@ public:
 
 ## Open questions
 
-where you list things that you are not sure of and would like the answer to.
-
-How is it decided which nodes store which data?
-
 
 ## Status
-where you describe what has been done and give an estimate of the work that remains.
 
 As of today we have the base non distributed base classes such as dataframes. We need to create algorithms to manage the distributed setting of this application and the key value store. We need to create the base application api for programmers to interface with.
 
 The aforementioned work that needs to be done has not been done as of submitting this report and should be the first priority. Further, this code should be extensively tested both for correctness and performance. As we work, we will need to maintain communication with the client and make changes to the API / design / architecture / implementation as new requests come in and the scope creeps. Management also needs to be kept in the loop to ensure we maintain the standards of CS4500 inc. 
 
 This will probably take us about 5 weeks. 
+
+As of 3/22:
+
+  - we have a one node KVStore with no distribution working with the sample "Trivial" class.
+
+  - We have no memory leaks
+
+  - We have a base Application class that manages the kv store. 

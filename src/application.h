@@ -44,6 +44,7 @@ public:
     DataFrame* df2 = kv.get(key);
     for (size_t i = 0; i < SZ; ++i) sum -= df2->get_int(0,i);
     assert(sum==0);
+    delete[] vals;
     delete df;
   }
 };

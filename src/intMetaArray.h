@@ -19,6 +19,10 @@ public:
         delete[] arrs_;
     }
 
+    IntMetaArray(char* serialized) {
+
+    }
+
     /* Creates a new empty intMetaArray with 1 inner array */
     IntMetaArray() {
         arrs_ = new int*[1];

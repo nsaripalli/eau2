@@ -34,6 +34,10 @@ public:
     /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
 
+    DataFrame (char* serialized) {
+
+    }
+
     virtual ~DataFrame() {
         for (int i = 0; i < this->columns->length(); i++) {
             delete this->columns->get(i);
@@ -366,5 +370,9 @@ public:
         delete s;
         kv->put(*key, df);
         return df;
+    }
+
+    char *serialize_object() {
+        return nullptr;
     }
 };

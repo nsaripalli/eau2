@@ -19,9 +19,14 @@
 class Application : public Object {
 public:
   KVStore kv;
+  static constexpr const char* IP = "127.0.0.2";
 
   Application(size_t idx) {
-    kv = KVStore(idx);
+    kv = KVStore(idx, IP, 8080);
+  }
+
+  bool done() {
+    return kv.client_->done;
   }
 };
 
@@ -41,7 +46,7 @@ public:
     Key key("triv",0);
     DataFrame* df = DataFrame::fromArray(&key, &kv, SZ, vals);
     assert(df->get_int(0,1) == 1);
-    DataFrame* df2 = kv.get(key);
+    DataFrame* df2 = kv.wait_and_get(key);
     for (size_t i = 0; i < SZ; ++i) sum -= df2->get_int(0,i);
     assert(sum==0);
     delete[] vals;

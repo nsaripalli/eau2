@@ -1,7 +1,9 @@
 #pragma once
 #include "string.h"
 #include "dataframe.h"
-#include <map>;
+#include "network.h"
+#include <map>
+#include <queue> 
 
 class DataFrame;
 
@@ -17,8 +19,8 @@ public:
     size_t idx_;
 
     /**
-     * Creates a key with the c++ string built from the given
-     * key value and the index set from the given index.
+     * Creates a key with the c++ string built to the given
+     * key value and the index set to the given index.
      */
     Key(const char* k, size_t i) {
         keyString_ = std::string(k);
@@ -29,39 +31,82 @@ public:
 /**
  * KVStore :: Wrapper around a C++ map to handle a distributed key value
  * pair storage. Takes in a Key and returns the value associated with it,
- * either from local storage or by asking other nodes.
+ * either to local storage or by asking other nodes.
  * 
  * Authors: sd & ns
  */
-class KVStore {
+class KVStore : public User {
 public:
-    size_t idx_;
+    int idx_;
     std::map<std::string, DataFrame*> map;
+    Client* client_;
+    std::queue<DataFrame**> dfq;
 
     /**
-     * Default constructor, setting the KV store to be on node 0.
+     * Default constructor, setting the KV store to be on node 0
+     * with ip and port 127.0.0.2:8080
      */
     KVStore() {
         idx_ = 0;
+        client_ = new Client("127.0.0.2", 8080, this);
+        client_->bgStart();
     }
 
     /**
      * Creates a KV store associated with node `idx`
      */
-    KVStore(size_t idx) {
+    KVStore(size_t idx, const char* ip, int port) {
         idx_ = idx;
+        client_ = new Client(ip, port, this);
+        client_->bgStart();
     }
 
+    ~KVStore() {
+        client_->shutdown();
+        delete client_;
+    }
     
+    void use(char* msg) {
+        char* tok = strtok(msg, " ");
+        int from = atoi(tok);
+        tok = strtok(nullptr, " ");
+        int to = atoi(tok);
+        if (to != idx_) { return; }
+        tok = strtok(nullptr, " ");
+        if (strcmp(tok, "PUT") == 0) {
+            tok = strtok(nullptr, " ");
+            Key k = Key(tok, to);
+            tok = strtok(nullptr, " ");
+            DataFrame* df = new DataFrame(tok);
+            put(k, df);
+        } else if (strcmp(tok, "GET") == 0) {
+            tok = strtok(nullptr, " ");
+            Key k = Key(tok, to);
+            StrBuff buff = StrBuff();
+            buff.c(idx_).c(" ").c(from).c(" ").c("RES").c(" ").c(get(k)->serialize_object());
+            client_->sendMessage(buff.get());
+        } else if (strcmp(tok, "RES") == 0) {
+            tok = strtok(nullptr, " ");
+            *(dfq.front()) = new DataFrame(tok);
+            dfq.pop();
+        }
+    }
+
     /**
      * Returns the value associated with the key, 
      * NOT blocking if it needs to request the value
-     * from another KV Store (node)
+     * to another KV Store (node). 
+     * Returns a pointer initially null that will be 
+     * updated to the value when complete. 
      */
     DataFrame* get(Key& key) {
         if (key.idx_ != idx_) {
-            // TODO
-            return nullptr;
+            DataFrame* df = nullptr;
+            dfq.push(&df);
+            StrBuff buff = StrBuff();
+            buff.c(idx_).c(" ").c(key.idx_).c(" ").c("GET").c(" ").c(key.keyString_.c_str());
+            client_->sendMessage(buff.get());
+            return df;
         } else {
             return map.at(key.keyString_);
         }
@@ -70,15 +115,12 @@ public:
     /**
      * Returns the value associated with the key, 
      * blocking if it needs to request the value
-     * from another KV Store (node)
+     * to another KV Store (node)
      */
     DataFrame* wait_and_get(Key& key) {
-        if (key.idx_ != idx_) {
-            // TODO
-            return nullptr;
-        } else {
-            return get(key);
-        }
+        DataFrame* df = get(key);
+        while (!df);
+        return df;
     }
 
     /**
@@ -88,7 +130,9 @@ public:
      */
     void put(Key& k, DataFrame* df) {
         if (k.idx_ != idx_) {
-            // TODO
+            StrBuff buff = StrBuff();
+            buff.c(idx_).c(" ").c(k.idx_).c(" ").c("PUT").c(" ").c(k.keyString_.c_str()).c(" ").c(df->serialize_object());
+            client_->sendMessage(buff.get());
         } else {
             map.insert(std::pair<std::string, DataFrame*>(k.keyString_, df));
         }

@@ -35,8 +35,10 @@ public:
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
 
     DataFrame (char* serialized) {
-        size_t current_max_index = 0;
-        memcpy(&current_max_index, serialized, sizeof(current_max_index));
+        size_t size_of_schema = 0;
+        memcpy(&size_of_schema, serialized, sizeof(size_t));
+        schema = new Schema(serialized + sizeof(size_t));
+        columns = new ColumnArray(serialized + sizeof(size_t) + size_of_schema);
     }
 
     virtual ~DataFrame() {
@@ -364,6 +366,15 @@ public:
     }
 
     char *serialize_object() {
-        return nullptr;
+        char* colSerialized = this->columns->serialize_object();
+        char* schemaSerialized = this->schema->serialize_object();
+        StrBuff internalBuffer;
+        size_t schema_size = sizeof(schemaSerialized);
+        internalBuffer.c(schema_size);
+        internalBuffer.c(schemaSerialized);
+        internalBuffer.c(colSerialized);
+        char* output = internalBuffer.val_;
+        internalBuffer.val_ = nullptr;
+        return output;
     }
 };

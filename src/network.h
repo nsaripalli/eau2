@@ -391,26 +391,38 @@ public:
 };
 
 /**
+ * User ::
+ * Helper class for clients, meant for any class that uses clients
+ * and needs custom behavior for a received MSG. Should be extended
+ */
+class User {
+public:
+  virtual void use(char* msg) {}
+
+  virtual ~User() {}
+};
+
+/**
  * Client ::
  * The "client" node in a peer-to-peer system. 
  * Registers with the "server" and is capable of sending messages
  * to other clients directly.
  * 
- * Gradefully shutsdown when told to by the server.
- * 
- * NOTE: Client is meant to run in the foreground.
+ * Gracefully shutsdown when told to by the server.
  */
 class Client : public Node {
 public:
   StringMetaArray* ips;
+  User* user_;
 
   /**
    * Constructor for the client, initializes the registered 
    * IPS list and sets the name of this node type.
    */
-  Client(const char* _ip, int _port) : Node(_ip, _port) {
+  Client(const char* _ip, int _port, User* user) : Node(_ip, _port) {
     ips = new StringMetaArray();
     name = "Client";
+    user_ = user;
   }
 
   /**
@@ -467,6 +479,7 @@ public:
       } else if (strcmp(tok, "MSG") == 0) {
         // print the message after "MSG "
         printf("[Client %s] Message Received: \"%s\"\n", ip->c_str(), &(received->c_str()[4])); 
+        user_->use(&(received->c_str()[4]));
       } else if (strcmp(tok, "END") == 0) {
         if (bg) {
           done = true;

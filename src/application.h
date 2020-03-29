@@ -20,9 +20,17 @@ class Application : public Object {
 public:
   KVStore kv;
 
-  Application(size_t idx) {
-    kv = KVStore(idx);
+  Application(int idx, char* ip) {
+    kv = KVStore(idx, ip, 8080);\
   }
+
+  bool done() {
+    return kv.client_->done;
+  }
+
+  int this_node() { return kv.idx_; }
+
+  virtual void run_() {}
 };
 
 /**
@@ -32,7 +40,7 @@ public:
  */
 class Trivial : public Application {
 public:
-  Trivial(size_t idx) : Application(idx) { assert(idx == 0); } // assumes 0 for M2 TODO
+  Trivial(int idx, char* ip) : Application(idx, ip) { assert(idx == 0); } // assumes 0 for M2
   void run_() {
     size_t SZ = 1000*1000;
     int* vals = new int[SZ];
@@ -41,7 +49,7 @@ public:
     Key key("triv",0);
     DataFrame* df = DataFrame::fromArray(&key, &kv, SZ, vals);
     assert(df->get_int(0,1) == 1);
-    DataFrame* df2 = kv.get(key);
+    DataFrame* df2 = kv.wait_and_get(key);
     for (size_t i = 0; i < SZ; ++i) sum -= df2->get_int(0,i);
     assert(sum==0);
     delete[] vals;

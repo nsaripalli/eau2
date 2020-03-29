@@ -19,15 +19,18 @@
 class Application : public Object {
 public:
   KVStore kv;
-  static constexpr const char* IP = "127.0.0.2";
 
-  Application(size_t idx) {
-    kv = KVStore(idx, IP, 8080);
+  Application(int idx, char* ip) {
+    kv = KVStore(idx, ip, 8080);\
   }
 
   bool done() {
     return kv.client_->done;
   }
+
+  int this_node() { return kv.idx_; }
+
+  virtual void run_() {}
 };
 
 /**
@@ -37,7 +40,7 @@ public:
  */
 class Trivial : public Application {
 public:
-  Trivial(size_t idx) : Application(idx) { assert(idx == 0); } // assumes 0 for M2 TODO
+  Trivial(int idx, char* ip) : Application(idx, ip) { assert(idx == 0); } // assumes 0 for M2
   void run_() {
     size_t SZ = 1000*1000;
     int* vals = new int[SZ];

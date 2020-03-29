@@ -55,7 +55,7 @@ public:
     /**
      * Creates a KV store associated with node `idx`
      */
-    KVStore(size_t idx, const char* ip, int port) {
+    KVStore(int idx, const char* ip, int port) {
         idx_ = idx;
         client_ = new Client(ip, port, this);
         client_->bgStart();

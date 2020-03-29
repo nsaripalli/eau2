@@ -26,6 +26,10 @@ public:
         arr_ = new IntMetaArray();
     }
 
+    IntColumn(char* serialized_object) {
+        arr_ = new IntMetaArray(serialized_object);
+    }
+
     /**
      * Constructor with variable number of arguments, specifed by n. 
      * Creates a column with the elements in it in the order given.
@@ -65,4 +69,8 @@ public:
 
     /** Set value at idx. An out of bound idx is undefined.  */
     void set(size_t idx, int val) { arr_->set(idx, val); }
+
+    char* serialize_object() {
+        return this->arr_->serialize_object();
+    }
 };

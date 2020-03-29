@@ -14,7 +14,7 @@
 *  author: shah.ash@husky.neu.edu | peters.ci@husky.neu.edu
 *  Implementation authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
 */
-class Array : public Object{
+class Array : public Object {
 public:
 
     size_t current_max_index;

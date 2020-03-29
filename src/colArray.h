@@ -12,14 +12,20 @@
 *  author: shah.ash@husky.neu.edu | peters.ci@husky.neu.edu
 *  Implementation authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
 */
-class ColumnArray : public Object {
+class ColumnArray : public SerializableObject {
 public:
 
     Array* internal_array;
+    const char* SERIALIZATION_DELIMETER = "\uECCF6e缽ȝ`ſǀƈ嘟ͥ\u1941";
 
     // default constructor
     ColumnArray() {
         internal_array = new Array();
+    }
+
+    ColumnArray(char* serailzied) {
+        internal_array = new Array();
+        
     }
 
     // destructor
@@ -123,5 +129,16 @@ public:
     */
     bool equals(Object* other) {
         return this->internal_array->equals(other);
+    }
+
+    char *serialize_object() override {
+        StrBuff interalBuffer;
+        for (size_t i = 0; i < this->length(); i++) {
+            interalBuffer.c(this->get(i)->serialize_object());
+            interalBuffer.c(SERIALIZATION_DELIMETER);
+        }
+        char* output = interalBuffer.val_;
+        interalBuffer.val_ = nullptr;
+        return output;
     }
 };

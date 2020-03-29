@@ -19,8 +19,21 @@ public:
         delete[] arrs_;
     }
 
-    IntMetaArray(char* serialized) {
+    IntMetaArray(char* totalBytesArray) : IntMetaArray() {
+        memcpy(&arrsNum_, totalBytesArray, sizeof(arrsNum_));
+        memcpy(&nextIndex_, totalBytesArray + sizeof(arrsNum_), sizeof(nextIndex_));
 
+        delete[] arrs_[0];
+        delete[] arrs_;
+        arrs_ = new int*[arrsNum_];
+
+        for (int i =0 ; i < arrsNum_; i++) {
+            int* curr_arrs = new int[arrSize_];
+            arrs_[i] = curr_arrs;
+            memcpy(arrs_[i],
+                    totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(int) * arrSize_),
+                    sizeof(int) * arrSize_);
+        }
     }
 
     /* Creates a new empty intMetaArray with 1 inner array */
@@ -76,5 +89,16 @@ public:
             size_t innerIdx = idx % arrSize_; // which index is the index at in that^ array
             arrs_[arrIdx][innerIdx] = val;
         }
+    }
+
+    char *serialize_object() {
+        char* totalBytesArray = new char[sizeof(arrsNum_) + sizeof(nextIndex_) + (arrsNum_ * sizeof(int) * arrSize_)];
+        memcpy(totalBytesArray, &arrsNum_, sizeof(arrsNum_));
+        memcpy(totalBytesArray + sizeof(arrsNum_), &nextIndex_, sizeof(nextIndex_));
+        for (int i =0 ; i < arrsNum_; i++) {
+            memcpy(totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(int) * arrSize_),
+                    arrs_[i], sizeof(int) * arrSize_);
+        }
+        return totalBytesArray;
     }
 };

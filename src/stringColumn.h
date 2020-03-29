@@ -18,6 +18,10 @@ public:
         delete arr_;
     }
 
+    StringColumn(char* serialized_object) {
+        arr_ = new StringMetaArray(serialized_object);
+    }
+
     /**
      * Default constructor. Creates an empty column with an
      * empty metaarray internally.
@@ -65,4 +69,8 @@ public:
 
     /** Set value at idx. An out of bound idx is undefined.  */
     void set(size_t idx, String* val) { arr_->set(idx, val); }
+
+    char* serialize_object() {
+        return this->arr_->serialize_object();
+    }
 };

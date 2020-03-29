@@ -65,4 +65,8 @@ public:
 
     /** Set value at idx. An out of bound idx is undefined. */
     void set(size_t idx, bool val) { arr_->set(idx, val); }
+
+    char* serialize_object() {
+        return this->arr_->serialize_object();
+    }
 };

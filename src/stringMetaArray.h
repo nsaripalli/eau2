@@ -28,6 +28,15 @@ public:
         nextIndex_ = 0;
     }
 
+    StringMetaArray(char *other) : StringMetaArray() {
+        char *idx = other;
+        while (*idx) {
+            String *currStringTok = new String(idx);
+            this->push_back(currStringTok);
+            idx += strlen(idx) + 1;
+        }
+    }
+
     /*
      * Adds the element to the end of the meta array (the next available index).
      * Resizes the meta array by adding another array if the meta array is at 
@@ -73,5 +82,15 @@ public:
             size_t innerIdx = idx % arrSize_; // which index is the index at in that^ array
             arrs_[arrIdx][innerIdx] = val;
         }
+    }
+
+    char *serialize_object() {
+        StrBuff interalBuffer;
+        for (size_t i = 0; i < this->nextIndex_; i++) {
+            interalBuffer.c(this->get(i)->serialize_object());
+        }
+        char* output = interalBuffer.val_;
+        interalBuffer.val_ = nullptr;
+        return output;
     }
 };

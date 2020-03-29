@@ -14,6 +14,14 @@ public:
         val_ = new char[capacity_ = 10];
         size_ = 0;
     }
+
+    virtual ~StrBuff() {
+//        This means val was stolen for serialization
+        if (val_ != nullptr){
+            delete[] val_;
+        }
+    }
+
     void grow_by_(size_t step) {
         if (step + size_ < capacity_) return;
         capacity_ *= 2;

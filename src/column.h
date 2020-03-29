@@ -2,6 +2,7 @@
 #include <cstdarg> // for varargs in all the children
 #include "string.h"
 #include "object.h"
+#include "serializableObject.h"
 
 // Include errors. seems to only work when not importing here.
 class IntColumn;
@@ -18,7 +19,7 @@ class FloatColumn;
  * This abstract class defines methods overriden in subclasses. There is
  * one subclass per element type. Columns are mutable, equality is pointer
  * equality. */
-class Column : public Object {
+class Column : public SerializableObject {
 public:
 
     /** Type converters: Return same column under its actual type, or
@@ -49,4 +50,8 @@ public:
     virtual char get_type_() {
         return '\0';
     };
+
+    virtual char *serialize_object() override {
+        return nullptr;
+    }
 };

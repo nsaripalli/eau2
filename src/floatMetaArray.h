@@ -73,4 +73,15 @@ public:
             arrs_[arrIdx][innerIdx] = val;
         }
     }
+
+    char *serialize_object() {
+        char* totalBytesArray = new char[sizeof(arrsNum_) + sizeof(nextIndex_) + (arrsNum_ * sizeof(float) * arrSize_)];
+        memcpy(totalBytesArray, &arrsNum_, sizeof(arrsNum_));
+        memcpy(totalBytesArray + sizeof(arrsNum_), &nextIndex_, sizeof(nextIndex_));
+        for (int i =0 ; i < arrsNum_; i++) {
+            memcpy(totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(float) * arrSize_),
+                   arrs_[i], sizeof(int) * arrSize_);
+        }
+        return totalBytesArray;
+    }
 };

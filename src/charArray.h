@@ -35,6 +35,25 @@ public:
         this->current_max_index = old->current_max_index;
     }
 
+    CharArray(char* buff) {
+        current_max_index = 0;
+        array_size = 0;
+
+        char* fullInput = buff;
+
+        const char s[2] = "\0";
+        char *token;
+
+        memcpy(&current_max_index, fullInput, sizeof(current_max_index));
+
+        memcpy(&array_size,  fullInput + sizeof(current_max_index), sizeof(array_size));
+
+        internal_list_ = new char[array_size];
+
+        char* outsideInternals = fullInput + sizeof(current_max_index) + sizeof(array_size);
+        memcpy(internal_list_, outsideInternals, array_size * sizeof(char));
+    }
+
     virtual ~CharArray() {
         delete[] internal_list_;
     }
@@ -226,4 +245,18 @@ public:
         return this->current_max_index;
     }  // Returns the hash code value for this list.
 
+    char * serialize_object() {
+        char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(char))];
+        char* bytesCurrent_max_index = totalBytesArray;
+        char* bytesArray_size = totalBytesArray + sizeof(current_max_index);
+        char*internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
+
+        memcpy(bytesCurrent_max_index, &current_max_index, sizeof(current_max_index));
+
+        memcpy(bytesArray_size, &array_size, sizeof(array_size));
+
+        memcpy(internalListSerialization, internal_list_, array_size * sizeof(char));
+
+        return totalBytesArray;
+    }
 };

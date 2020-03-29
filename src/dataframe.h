@@ -35,7 +35,8 @@ public:
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
 
     DataFrame (char* serialized) {
-
+        size_t current_max_index = 0;
+        memcpy(&current_max_index, serialized, sizeof(current_max_index));
     }
 
     virtual ~DataFrame() {
@@ -105,16 +106,6 @@ public:
     String *get_string(size_t col, size_t row) {
         StringColumn *selectedColumn = this->columns->get(col)->as_string();
         return selectedColumn->get(row);
-    }
-
-    /** Return the offset of the given column name or -1 if no such col. */
-    int get_col(String &col) {
-        return this->schema->col_idx(col.c_str());
-    }
-
-    /** Return the offset of the given row name or -1 if no such row. */
-    int get_row(String &col) {
-        return this->schema->row_idx(col.c_str());
     }
 
     /** Set the value at the given column and row to the given value.

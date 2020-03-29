@@ -44,7 +44,7 @@ public:
         internal_list_ = new float[array_size];
 
         char* outsideInternals = fullInput + sizeof(current_max_index) + sizeof(array_size);
-        memcpy(internal_list_, outsideInternals, array_size * sizeof(bool));
+        memcpy(internal_list_, outsideInternals, array_size * sizeof(float));
     }
 
     virtual ~FloatArray() {
@@ -246,8 +246,7 @@ public:
     }  // Returns the hash code value for this list.
 
     char * serialize_object() {
-//        StrBuff* buff = new StrBuff();
-        char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(bool))];
+        char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(float))];
         char* bytesCurrent_max_index = totalBytesArray;
         char* bytesArray_size = totalBytesArray + sizeof(current_max_index);
         char*internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
@@ -256,7 +255,7 @@ public:
 
         memcpy(bytesArray_size, &array_size, sizeof(array_size));
 
-        memcpy(internalListSerialization, internal_list_, array_size * sizeof(bool));
+        memcpy(internalListSerialization, internal_list_, array_size * sizeof(float));
 
         return totalBytesArray;
     }

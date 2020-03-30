@@ -1,5 +1,4 @@
 #include "../src/network.h"
-#include "../src/intMetaArray.h"
 #include <stdio.h> 
 
 int main(int argc, char *argv[]) {

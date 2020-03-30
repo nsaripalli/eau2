@@ -11,7 +11,7 @@ public:
   Key verify = Key("verif",0);
   Key check = Key("ck",0);
  
-  Demo(size_t idx, char* ip): Application(idx, ip) {}
+  Demo(size_t idx, const char* ip): Application(idx, ip) {}
  
   void run_() override {
     switch(this_node()) {

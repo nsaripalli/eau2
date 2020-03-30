@@ -41,7 +41,7 @@ add_subdirectory(${CMAKE_CURRENT_BINARY_DIR}/googletest-src
 SET(CMAKE_C_FLAGS_DEBUG "-D_DEBUG")
 
 
-add_executable(basic_example server.cpp)
+add_executable(basic_example ../m3.cpp)
 #target_link_libraries(basic_example gtest)
 
 #add_executable(basic_example client.cpp)

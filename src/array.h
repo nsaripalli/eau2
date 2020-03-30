@@ -231,7 +231,7 @@ public:
         return this->current_max_index;
     }
 
-    size_t hash() {
+    size_t hash_me() {
         size_t total_hash = 19;
         int prime = 5;
         for (size_t i = 0; i < this->current_max_index; i++) {

@@ -1,8 +1,7 @@
 #pragma once
 
-#include "dataframe.h";
-#include "object.h";
-#include "KVStore.h";
+#include "dataframe.h"
+#include "object.h"
 
 /**
  * Application :: pre-defines the code for setting up the distributed key value 

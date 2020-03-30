@@ -6,4 +6,19 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(software-dev-as4)
 
-add_executable(main tests/application_test.cpp)
+cmake_minimum_required(VERSION 2.8.2)
+
+# specify the C++ standard
+set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+SET(GCC_COVERAGE_COMPILE_FLAGS "")
+SET(GCC_COVERAGE_LINK_FLAGS    "-lpthread")
+
+SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${GCC_COVERAGE_COMPILE_FLAGS}")
+SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS}")
+
+find_package(Threads REQUIRED)
+
+
+add_executable(main tests/m3.cpp)

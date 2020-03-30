@@ -33,13 +33,13 @@
 class Key {
 public:
     std::string keyString_;
-    size_t idx_;
+    int idx_;
 
     /**
      * Creates a key with the c++ string built to the given
      * key value and the index set to the given index.
      */
-    Key(const char* k, size_t i) {
+    Key(const char* k, int i) {
         keyString_ = std::string(k);
         idx_ = 0;
     }

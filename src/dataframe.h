@@ -2,6 +2,7 @@
 
 #include <thread>
 
+#include "strBuff.h"
 #include "column.h"
 #include "fielder.h"
 #include "helper.h"
@@ -9,7 +10,6 @@
 #include "row.h"
 #include "rower.h"
 #include "schema.h"
-#include "strBuff.h"
 #include "string.h"
 #include "stringColumn.h"
 #include "intColumn.h"

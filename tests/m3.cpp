@@ -1,7 +1,5 @@
 #include "../src/dataframe.h"
 #include "../src/network.h"
-#include "../src/intMetaArray.h"
-#include "../src/stringMetaArray.h"
 #include "../src/application.h"
 #include <thread>
 

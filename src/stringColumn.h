@@ -74,7 +74,7 @@ public:
         return this->arr_->serialize_object();
     }
 
-    bool equals(Object *other) override {
+    bool equals(Object *other) {
         if (other == nullptr) return false;
         StringColumn *s = dynamic_cast<StringColumn*>(other);
         if (s == nullptr) return false;

@@ -1,7 +1,10 @@
 #pragma once
 
+#include <assert.h>
 #include "string.h"
 #include "serializableObject.h"
+#include "object.h"
+
 
 /** A string buffer builds a string from various pieces.
  *  author: jv */
@@ -16,12 +19,7 @@ public:
         size_ = 0;
     }
 
-    virtual ~StrBuff() {
-//        This means val was stolen for serialization
-//        if (val_ != nullptr){
-//            delete[] val_;
-//        }
-    }
+    virtual ~StrBuff() {}
 
     void grow_by_(size_t step) {
         if (step + size_ < capacity_) return;

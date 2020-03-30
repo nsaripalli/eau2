@@ -84,16 +84,12 @@ public:
         }
     }
 
-    char *serialize_object() {
+    Serialized serialize_object() {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->nextIndex_; i++) {
             interalBuffer.c(this->get(i)->serialize_object());
-            interalBuffer.c("\0");
         }
-        interalBuffer.c(false);
-        char* output = interalBuffer.val_;
-        interalBuffer.val_ = nullptr;
-        return output;
+        return interalBuffer.getSerialization();
     }
 
     bool equals(Object *other) override {

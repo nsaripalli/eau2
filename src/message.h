@@ -67,13 +67,14 @@ public:
 
     }
 
-    char *serialize_object() override {
+    Serialized serialize_object() override {
+        size_t size = sizeof(int) +
+                      sizeof(sender_) +
+                      sizeof(target_) +
+                      sizeof(id_) +
+                      sizeof(c_ain);
         char *kindptr = new char[
-        sizeof(int) +
-        sizeof(sender_) +
-        sizeof(target_) +
-        sizeof(id_) +
-        sizeof(c_ain)
+        size
         ];
 
 
@@ -94,6 +95,7 @@ public:
         char *cainPtr = idPtr + sizeof(id_);
         memcpy(cainPtr, &c_ain, sizeof(c_ain));
 
-        return kindptr;
+        Serialized out = {size, kindptr};
+        return out;
     }
 };

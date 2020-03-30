@@ -1,4 +1,5 @@
 #pragma once
+
 #include <cstdarg> // for varargs in all the children
 #include "string.h"
 #include "object.h"
@@ -24,17 +25,23 @@ public:
 
     /** Type converters: Return same column under its actual type, or
      *  nullptr if of the wrong type.  */
-    virtual IntColumn* as_int() { return nullptr; }
-    virtual BoolColumn*  as_bool() { return nullptr; }
-    virtual FloatColumn* as_float() { return nullptr; }
-    virtual StringColumn* as_string() { return nullptr; }
+    virtual IntColumn *as_int() { return nullptr; }
+
+    virtual BoolColumn *as_bool() { return nullptr; }
+
+    virtual FloatColumn *as_float() { return nullptr; }
+
+    virtual StringColumn *as_string() { return nullptr; }
 
     /** Type appropriate push_back methods. Calling the wrong method is
       * undefined behavior. **/
     virtual void push_back(int val) {};
+
     virtual void push_back(bool val) {};
+
     virtual void push_back(float val) {};
-    virtual void push_back(String* val) {};
+
+    virtual void push_back(String *val) {};
 
     /** Returns the number of elements in the column. */
     virtual size_t size() {
@@ -43,7 +50,7 @@ public:
 
     /** Return the type of this column as a char: 'S', 'B', 'I' and 'F'.**/
     char get_type() {
-      return get_type_();
+        return get_type_();
     }
 
     /** "private" virtual helper for get_type as per Piazza post 575 **/
@@ -51,7 +58,5 @@ public:
         return '\0';
     };
 
-    virtual char *serialize_object() override {
-        return nullptr;
-    }
+    virtual Serialized serialize_object() = 0;
 };

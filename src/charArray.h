@@ -14,7 +14,7 @@
 *  author: shah.ash@husky.neu.edu | peters.ci@husky.neu.edu
 *  Implementation authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
 */
-class CharArray : public Object{
+class CharArray : public Object {
 public:
 
     size_t current_max_index;
@@ -28,7 +28,7 @@ public:
         this->current_max_index = 0;
     }
 
-    CharArray(CharArray* old) {
+    CharArray(CharArray *old) {
         array_size = old->array_size;
         internal_list_ = new char[array_size];
         memcpy(internal_list_, old->internal_list_, array_size * sizeof(char));
@@ -39,18 +39,18 @@ public:
         current_max_index = 0;
         array_size = 0;
 
-        char* fullInput = buff;
+        char *fullInput = buff;
 
         const char s[2] = "\0";
         char *token;
 
         memcpy(&current_max_index, fullInput, sizeof(current_max_index));
 
-        memcpy(&array_size,  fullInput + sizeof(current_max_index), sizeof(array_size));
+        memcpy(&array_size, fullInput + sizeof(current_max_index), sizeof(array_size));
 
         internal_list_ = new char[array_size];
 
-        char* outsideInternals = fullInput + sizeof(current_max_index) + sizeof(array_size);
+        char *outsideInternals = fullInput + sizeof(current_max_index) + sizeof(array_size);
         memcpy(internal_list_, outsideInternals, array_size * sizeof(char));
     }
 
@@ -60,7 +60,7 @@ public:
 
     // If the array is too small, doubles the array size
     void double_array_size() {
-        char*new_list = new char[array_size * 2];
+        char *new_list = new char[array_size * 2];
         memset(new_list, 0, array_size * 2 * sizeof(char));
         memcpy(new_list, internal_list_, array_size * sizeof(char));
         array_size *= 2;
@@ -114,7 +114,7 @@ public:
     * @arg a: the array of elements to be added to this list
     * @arg index: the index at which to add the elements of the given array
     */
-    void add_all(Array* a, size_t index) {
+    void add_all(Array *a, size_t index) {
         if (index < 0) {
             indexOutOfBounds(index, this->length());
         }
@@ -215,9 +215,9 @@ public:
      * Checks object equality to the given object
      * @param other the object to compare to
      */
-    virtual bool equals(Object* other) {
+    virtual bool equals(Object *other) {
         if (other == nullptr) return false;
-        CharArray *s = dynamic_cast<CharArray*>(other);
+        CharArray *s = dynamic_cast<CharArray *>(other);
         if (s == nullptr) return false;
 
         if (s->length() != this->length()) {
@@ -245,12 +245,13 @@ public:
         return this->current_max_index;
     }  // Returns the hash code value for this list.
 
-    char * serialize_object() {
-//        char* totalBytesArray = new char[2];
-        char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(char))];
-        char* bytesCurrent_max_index = totalBytesArray;
-        char* bytesArray_size = totalBytesArray + sizeof(current_max_index);
-        char*internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
+
+    Serialized serialize_object() {
+        size_t serialization_output_length = sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(char));
+        char *totalBytesArray = new char[serialization_output_length];
+        char *bytesCurrent_max_index = totalBytesArray;
+        char *bytesArray_size = totalBytesArray + sizeof(current_max_index);
+        char *internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
 
         memcpy(bytesCurrent_max_index, &current_max_index, sizeof(current_max_index));
 
@@ -258,6 +259,8 @@ public:
 
         memcpy(internalListSerialization, internal_list_, array_size * sizeof(char));
 
-        return totalBytesArray;
+
+        Serialized out = {serialization_output_length, totalBytesArray};
+        return out;
     }
 };

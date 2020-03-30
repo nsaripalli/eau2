@@ -1,9 +1,9 @@
 #pragma once
 // LANGUAGE: CwC
+#include "serializableObject.h"
 #include <cstring>
 #include <string>
 #include <cassert>
-#include "object.h"
 
 /** An immutable string class that wraps a character array.
  * The character array is zero terminated. The size() of the
@@ -84,8 +84,9 @@ public:
         return hash;
     }
 
-    char *serialize_object() {
+    Serialized serialize_object() {
         String cpy(*this);
-        return cpy.steal();
+        Serialized out = {cpy.size_, cpy.steal()};
+        return out;
     }
 };

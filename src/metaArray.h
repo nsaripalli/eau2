@@ -24,7 +24,7 @@
  * 
  * authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
  */
-class MetaArray : public Object {
+class MetaArray : public SerializableObject {
 public:
     static const size_t arrSize_ = 100; // (constant) size of each array, make smaller for testing to be easier
     size_t arrsNum_; // number of arrays
@@ -34,4 +34,6 @@ public:
     virtual size_t hash_me() { return reinterpret_cast<size_t>(this); };
 
     virtual size_t size() { return nextIndex_; }
+
+    virtual Serialized serialize_object() = 0;
 };

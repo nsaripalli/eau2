@@ -157,16 +157,15 @@ public:
         return this->internal_array->equals(other);
     }
 
-    char *serialize_object() override {
+    Serialized serialize_object() override {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
-            char* curr_col = this->get(i)->serialize_object();
+            Serialized curr_col = this->get(i)->serialize_object();
             interalBuffer.c(curr_col);
-            delete [] curr_col;
+            delete [] curr_col.data;
             interalBuffer.c(SERIALIZATION_DELIMETER);
         }
-        char* output = interalBuffer.val_;
-        interalBuffer.val_ = nullptr;
-        return output;
+
+        return interalBuffer.getSerialization();
     }
 };

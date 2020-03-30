@@ -1,6 +1,7 @@
 #pragma once
 
 #include "string.h"
+#include "serializableObject.h"
 
 /** A string buffer builds a string from various pieces.
  *  author: jv */
@@ -33,6 +34,10 @@ public:
     }
     StrBuff& c(const char* str) {
         size_t step = strlen(str);
+        return c(str, step);
+    }
+
+    StrBuff& c(const char* str, size_t step) {
         grow_by_(step);
         memcpy(val_+size_, str, step);
         size_ += step;
@@ -40,7 +45,17 @@ public:
     }
 
     StrBuff& c(String &s) { return c(s.c_str());  }
-    StrBuff& c(size_t v) { return c(std::to_string(v).c_str());  } // Cpp
+    StrBuff& c(size_t v) {
+        return c(convert_size_to_string(v));
+    } // Cpp
+
+    StrBuff c(Serialized s) {
+        return c(s.data, s.size);
+    }
+
+    static const char* convert_size_to_string(size_t v) {
+        return std::to_string(v).c_str();
+    }
 
     String* get() {
         assert(val_ != nullptr); // can be called only once
@@ -49,5 +64,11 @@ public:
         String *res = new String(true, val_, size_);
         val_ = nullptr; // val_ was consumed above
         return res;
+    }
+
+    Serialized getSerialization() {
+        Serialized out = {this->size_, this->val_};
+        val_ = nullptr; // val_ was consumed above
+        return out;
     }
 };

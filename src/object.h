@@ -28,4 +28,9 @@ public:
 
     /** Returned c_str is owned by the object, don't modify nor delete. */
     virtual char* c_str() { return nullptr; }
-}; 
+};
+
+struct Serialized {
+    size_t size;
+    char* data;
+};

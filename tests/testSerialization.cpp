@@ -9,13 +9,13 @@
 #include "../src/message.h"
 #include "../src/dataframe.h"
 
-int testboolMetaArray(){
+int testboolMetaArray() {
     BoolMetaArray original;
     for (int i = 0; i < 100; i++) {
         original.push_back(i % 1);
     }
 
-    char* serialized = original.serialize_object();
+    char *serialized = original.serialize_object().data;
 
     BoolMetaArray dup(serialized);
 
@@ -30,7 +30,7 @@ int testFloatMetaArray() {
         original.push_back(i);
     }
 
-    char* serialized = original.serialize_object();
+    char *serialized = original.serialize_object().data;
 
     FloatMetaArray dup(serialized);
 
@@ -45,7 +45,7 @@ int testIntMetaArray() {
         original.push_back(i);
     }
 
-    char* serialized = original.serialize_object();
+    char *serialized = original.serialize_object().data;
 
     IntMetaArray dup(serialized);
 
@@ -56,21 +56,21 @@ int testIntMetaArray() {
     return 0;
 }
 
-int testStringMetaArray() {
-    StringMetaArray original;
-    String test("test");
-    for (int i = 0; i < 100; i++) {
-        original.push_back(&test);
-    }
-
-    char* serialized = original.serialize_object();
-
-    StringMetaArray dup(serialized);
-    assert(original.equals(&dup));
-
-    delete[] serialized;
-    return 0;
-}
+//int testStringMetaArray() {
+//    StringMetaArray original;
+//    String test("test");
+//    for (int i = 0; i < 100; i++) {
+//        original.push_back(&test);
+//    }
+//
+//    char* serialized = original.serialize_object();
+//
+//    StringMetaArray dup(serialized);
+//    assert(original.equals(&dup));
+//
+//    delete[] serialized;
+//    return 0;
+//}
 
 int testMetaArray() {
     testboolMetaArray();
@@ -81,17 +81,34 @@ int testMetaArray() {
 
 int testSchema() {
     Schema original("BIFSSSSSBBIIFFF");
-    char* ser = original.serialize_object();
+    char *ser = original.serialize_object().data;
     Schema dup(ser);
 
     assert(original.equals(&dup));
+
+    delete[] ser;
     return 0;
 
+}
+
+int testCharArray() {
+    CharArray orig;
+    const char *random = "09840jndfkldzuu r DqJD MLKXZ";
+    for (int i = 0; i < 100; i++) {
+        orig.append(random[i % 27]);
+    }
+    char *seri = orig.serialize_object().data;
+
+    CharArray dump(seri);
+
+    assert(orig.equals(&dump));
+    return 0;
 }
 
 int main() {
     testMetaArray();
     testSchema();
+    testCharArray();
 //    BoolArray testing;
 //    for (int i = 0; i < 11; i++) {
 //        testing.append(true);
@@ -131,10 +148,11 @@ int main() {
     }
     testingDF.set(0, 17, false);
 
-    char* testSerializationDF = testingDF.serialize_object();
-    DataFrame deSeralizedDF(testSerializationDF);
+    Serialized testSerializationDF = testingDF.serialize_object();
+
+    DataFrame deSeralizedDF(testSerializationDF.data);
 
 
     assert(testingDF.equals(&deSeralizedDF));
-    delete[] testSerializationDF;
+    delete[] testSerializationDF.data;
 }

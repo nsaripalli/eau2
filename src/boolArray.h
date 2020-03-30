@@ -240,9 +240,10 @@ public:
         return this->current_max_index;
     }  // Returns the hash code value for this list.
 
-    char * serialize_object() {
+    Serialized serialize_object() {
 //        StrBuff* buff = new StrBuff();
-        char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(bool))];
+        size_t size_of_output = sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(bool));
+        char* totalBytesArray = new char[size_of_output];
         char* bytesCurrent_max_index = totalBytesArray;
         char* bytesArray_size = totalBytesArray + sizeof(current_max_index);
         char*internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
@@ -253,7 +254,8 @@ public:
 
         memcpy(internalListSerialization, internal_list_, array_size * sizeof(bool));
 
-        return totalBytesArray;
+        struct Serialized out = {size_of_output, totalBytesArray};
+        return out;
     }
 
 };

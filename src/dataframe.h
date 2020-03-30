@@ -158,9 +158,11 @@ public:
     DataFrame(char *serialized) {
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
-        schema = new Schema(serialized + sizeof(size_t));
+        char* tok=serialized + sizeof(size_t);
+
+        schema = new Schema(tok);
 //        TODO be cleaner.
-        columns = new ColumnArray(serialized + sizeof(size_t) + size_of_schema, schema->column_types->internal_list_);
+        columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
     }
 
     virtual ~DataFrame() {
@@ -499,20 +501,24 @@ public:
         return df;
     }
 
-    char *serialize_object() {
-        char *schemaSerialized = this->schema->serialize_object();
+    Serialized serialize_object() {
+        Serialized schemaSerialized = this->schema->serialize_object();
+        size_t schema_size = schemaSerialized.size;
+//        Schema test(schemaSerialized);
+
+        char schema_size_serailzied[sizeof(size_t)];
+        memset(&schema_size_serailzied, 0, sizeof(size_t));
+        memcpy(&schema_size_serailzied, &schema_size, sizeof(size_t));
+
         StrBuff internalBuffer;
-        size_t schema_size = sizeof(schemaSerialized);
-//        TODO I do not trust this
-        internalBuffer.c(schema_size);
+        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
         internalBuffer.c(schemaSerialized);
-        delete[] schemaSerialized;
-        char *colSerialized = this->columns->serialize_object();
+        delete[] schemaSerialized.data;
+
+        Serialized colSerialized = this->columns->serialize_object();
         internalBuffer.c(colSerialized);
-        delete[] colSerialized;
-        char* output = internalBuffer.val_;
-        internalBuffer.val_ = nullptr;
-        return output;
+        delete[] colSerialized.data;
+        return internalBuffer.getSerialization();
     }
 
     bool equals(Object *other) override;

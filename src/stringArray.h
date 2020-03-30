@@ -135,38 +135,12 @@ public:
         return this->internal_array->equals(other);
     }
 
-    char *serialize_object_w_size_in_front() {
-//        Build up init str with only the payload
+
+    Serialized serialize_object() {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
             interalBuffer.c(this->get(i)->serialize_object());
         }
-        char* first_output = interalBuffer.val_;
-        interalBuffer.val_ = nullptr;
-
-//        Recreate the output with the size in front and then payload
-        StrBuff final_output;
-        final_output.c(interalBuffer.size_);
-        char* only_actual = new char[interalBuffer.size_];
-        memcpy(only_actual, first_output, interalBuffer.size_);
-        final_output.c(only_actual);
-
-//        Get the final char* out
-        char* output = final_output.val_;
-        final_output.val_ = nullptr;
-
-        return output;
-    }
-
-
-    char *serialize_object() {
-        StrBuff interalBuffer;
-        for (size_t i = 0; i < this->length(); i++) {
-            interalBuffer.c(this->get(i)->serialize_object());
-        }
-        interalBuffer.c(nullptr);
-        char* output = interalBuffer.val_;
-        interalBuffer.val_ = nullptr;
-        return output;
+        return interalBuffer.getSerialization();
     }
 };

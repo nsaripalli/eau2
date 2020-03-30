@@ -91,15 +91,17 @@ public:
         }
     }
 
-    char *serialize_object() {
-        char* totalBytesArray = new char[sizeof(arrsNum_) + sizeof(nextIndex_) + (arrsNum_ * sizeof(float) * arrSize_)];
+    Serialized serialize_object() {
+        size_t size_of_serialization =  sizeof(arrsNum_) + sizeof(nextIndex_) + (arrsNum_ * sizeof(float) * arrSize_);
+        char* totalBytesArray = new char[size_of_serialization];
         memcpy(totalBytesArray, &arrsNum_, sizeof(arrsNum_));
         memcpy(totalBytesArray + sizeof(arrsNum_), &nextIndex_, sizeof(nextIndex_));
         for (int i =0 ; i < arrsNum_; i++) {
             memcpy(totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(float) * arrSize_),
                    arrs_[i], sizeof(int) * arrSize_);
         }
-        return totalBytesArray;
+        Serialized out = {size_of_serialization, totalBytesArray};
+        return out;
     }
 
     bool equals(Object *other) override {

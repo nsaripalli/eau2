@@ -61,9 +61,8 @@ public:
         return this->column_types->length();
     }
 
-    char* serialize_object() {
-        char* types = column_types->serialize_object();
-        return types;
+    Serialized serialize_object() {
+        return column_types->serialize_object();
     }
 
     bool equals(Object *other) override {

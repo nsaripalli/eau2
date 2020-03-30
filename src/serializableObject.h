@@ -4,5 +4,5 @@
 
 class SerializableObject: public Object {
 public:
-    virtual char* serialize_object() { return nullptr; }
+    virtual Serialized serialize_object() = 0;
 };

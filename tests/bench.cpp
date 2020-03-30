@@ -9,7 +9,6 @@
 #include "../src/boolColumn.h"
 #include "../src/stringColumn.h"
 #include "../src/dataframe.h"
-#include "../src/modified_dataframe.h"
 
 int num_columns;
 size_t df_len;
@@ -134,7 +133,7 @@ int regular_dataframe(Rower &theRower) {
 
 int mregular_dataframe(Rower &theRower) {
     Schema *schema = new Schema();
-    MDataFrame *df = new MDataFrame(*schema);
+    DataFrame *df = new DataFrame(*schema);
 
     for (int i = 0; i < num_columns; i++) {
         IntColumn *int_col = new IntColumn();

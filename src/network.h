@@ -329,6 +329,8 @@ public:
  * Graceful shutdown is also meant to come from the server. 
  * When the server is shutdown, it tells all the registered 
  * clients to do the same.
+ * 
+ * NOTE: Expects only the ip addresses to be sent.
  */
 class Server : public Node {
 public:
@@ -409,6 +411,11 @@ public:
  * to other clients directly.
  * 
  * Gracefully shutsdown when told to by the server.
+ * 
+ * NOTE: Expects, IPS, END, or MSG headers. Anything else is undefined.
+ * MSG should be used for anything not part of the internal networking
+ * logic. The other headers should not be used outside of the networking
+ * logic.
  */
 class Client : public Node {
 public:

@@ -19,6 +19,23 @@ public:
         delete[] arrs_;
     }
 
+    BoolMetaArray(char* totalBytesArray) : BoolMetaArray() {
+        memcpy(&arrsNum_, totalBytesArray, sizeof(arrsNum_));
+        memcpy(&nextIndex_, totalBytesArray + sizeof(arrsNum_), sizeof(nextIndex_));
+
+        delete[] arrs_[0];
+        delete[] arrs_;
+        arrs_ = new bool*[arrsNum_];
+
+        for (int i =0 ; i < arrsNum_; i++) {
+            bool* curr_arrs = new bool[arrSize_];
+            arrs_[i] = curr_arrs;
+            memcpy(arrs_[i],
+                   totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(bool) * arrSize_),
+                   sizeof(bool) * arrSize_);
+        }
+    }
+
     /* Creates a new empty BoolMetaArray with 1 inner array */
     BoolMetaArray() {
         arrs_ = new bool*[1];
@@ -83,5 +100,20 @@ public:
                    arrs_[i], sizeof(bool) * arrSize_);
         }
         return totalBytesArray;
+    }
+
+    bool equals(Object *other) override {
+        if (other == nullptr) return false;
+        BoolMetaArray *s = dynamic_cast<BoolMetaArray*>(other);
+        if (s == nullptr) return false;
+        if ((this->arrsNum_ == s->arrsNum_) && (this->nextIndex_ == s->nextIndex_)) {
+            for (int i =0 ; i < arrsNum_; i++) {
+                if (memcmp(this->arrs_[i], s->arrs_[i], sizeof(bool) * arrSize_) != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 };

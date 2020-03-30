@@ -26,6 +26,10 @@ public:
         arr_ = new FloatMetaArray();
     }
 
+    FloatColumn(char* serialized_object) {
+        arr_ = new FloatMetaArray(serialized_object);
+    }
+
     /**
      * Constructor with variable number of arguments, specifed by n. 
      * Creates a column with the elements in it in the order given.

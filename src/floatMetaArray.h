@@ -27,6 +27,23 @@ public:
         nextIndex_ = 0;
     }
 
+    FloatMetaArray (char* totalBytesArray) : FloatMetaArray() {
+        memcpy(&arrsNum_, totalBytesArray, sizeof(arrsNum_));
+        memcpy(&nextIndex_, totalBytesArray + sizeof(arrsNum_), sizeof(nextIndex_));
+
+        delete[] arrs_[0];
+        delete[] arrs_;
+        arrs_ = new float*[arrsNum_];
+
+        for (int i =0 ; i < arrsNum_; i++) {
+            float* curr_arrs = new float[arrSize_];
+            arrs_[i] = curr_arrs;
+            memcpy(arrs_[i],
+                   totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(float) * arrSize_),
+                   sizeof(float) * arrSize_);
+        }
+    }
+
     /*
      * Adds the element to the end of the meta array (the next available index).
      * Resizes the meta array by adding another array if the meta array is at 
@@ -83,5 +100,20 @@ public:
                    arrs_[i], sizeof(int) * arrSize_);
         }
         return totalBytesArray;
+    }
+
+    bool equals(Object *other) override {
+        if (other == nullptr) return false;
+        FloatMetaArray *s = dynamic_cast<FloatMetaArray*>(other);
+        if (s == nullptr) return false;
+        if ((this->arrsNum_ == s->arrsNum_) && (this->nextIndex_ == s->nextIndex_)) {
+            for (int i =0 ; i < arrsNum_; i++) {
+                if (memcmp(this->arrs_[i], s->arrs_[i], sizeof(float) * arrSize_) != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 };

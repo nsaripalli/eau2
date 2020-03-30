@@ -88,9 +88,26 @@ public:
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->nextIndex_; i++) {
             interalBuffer.c(this->get(i)->serialize_object());
+            interalBuffer.c("\0");
         }
+        interalBuffer.c(false);
         char* output = interalBuffer.val_;
         interalBuffer.val_ = nullptr;
         return output;
+    }
+
+    bool equals(Object *other) override {
+        if (other == nullptr) return false;
+        StringMetaArray *s = dynamic_cast<StringMetaArray*>(other);
+        if (s == nullptr) return false;
+        if ((this->arrsNum_ == s->arrsNum_) && (this->nextIndex_ == s->nextIndex_)) {
+            for (size_t i = 0; i < this->nextIndex_; i++) {
+                if (!this->get(i)->equals(s->get(i))) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
     }
 };

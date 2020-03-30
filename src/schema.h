@@ -65,4 +65,12 @@ public:
         char* types = column_types->serialize_object();
         return types;
     }
+
+    bool equals(Object *other) override {
+        if (other == nullptr) return false;
+        Schema *s = dynamic_cast<Schema*>(other);
+        if (s == nullptr) return false;
+
+        return this->column_types->equals(s->column_types);
+    }
 };

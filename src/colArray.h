@@ -26,9 +26,32 @@ public:
         internal_array = new Array();
     }
 
-    ColumnArray(char* serailzied) {
+    ColumnArray(char* serailzied, char* schema) {
         internal_array = new Array();
-        
+        // Returns first token
+        char* token = strtok(serailzied, SERIALIZATION_DELIMETER);
+        int curr_col_idx = 0;
+
+        // Keep printing tokens while one of the
+        // delimiters present in str[].
+        while (token != NULL) {
+
+            if ('S' == schema[curr_col_idx]) {
+                this->internal_array->append(new StringColumn(token));
+            }
+            if ('B' == schema[curr_col_idx]) {
+                this->internal_array->append(new BoolColumn(token));
+            }
+            if ('I' == schema[curr_col_idx]) {
+                this->internal_array->append(new IntColumn(token));
+            }
+            if ('F' == schema[curr_col_idx]) {
+                this->internal_array->append(new FloatColumn(token));
+            }
+
+
+            token = strtok(NULL, SERIALIZATION_DELIMETER);
+        }
     }
 
     // destructor

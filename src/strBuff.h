@@ -18,9 +18,9 @@ public:
 
     virtual ~StrBuff() {
 //        This means val was stolen for serialization
-        if (val_ != nullptr){
-            delete[] val_;
-        }
+//        if (val_ != nullptr){
+//            delete[] val_;
+//        }
     }
 
     void grow_by_(size_t step) {
@@ -68,7 +68,7 @@ public:
 
     Serialized getSerialization() {
         Serialized out = {this->size_, this->val_};
-        val_ = nullptr; // val_ was consumed above
+        this->val_ = nullptr; // val_ was consumed above
         return out;
     }
 };

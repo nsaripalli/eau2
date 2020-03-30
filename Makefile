@@ -20,7 +20,7 @@ test:
 	./personal
 	./app
     (sleep 5; run-client) &
-    (cd ../src; run-server) 
+    (cd ../src; run-server)
 
 valgrind:
 	valgrind ./test

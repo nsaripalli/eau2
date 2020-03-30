@@ -73,4 +73,12 @@ public:
     Serialized serialize_object() {
         return this->arr_->serialize_object();
     }
+
+    bool equals(Object *other) override {
+        if (other == nullptr) return false;
+        IntColumn *s = dynamic_cast<IntColumn*>(other);
+        if (s == nullptr) return false;
+
+        return this->arr_->equals(s->arr_);
+    }
 };

@@ -17,7 +17,7 @@ public:
 
     Array* internal_array;
 //    const char* SERIALIZATION_DELIMETER = "\uECCF6e缽ȝ`ſǀƈ嘟ͥ\u1941";
-    const char* SERIALIZATION_DELIMETER = "././";
+    const char* SERIALIZATION_DELIMETER = "////";
 
 
 
@@ -26,32 +26,63 @@ public:
         internal_array = new Array();
     }
 
-    ColumnArray(char* serailzied, char* schema) {
-        internal_array = new Array();
+    void handleNestedArrayGeneration(char* token, char schema_type) {
+        if ('S' == schema_type) {
+            this->internal_array->append(new StringColumn(token));
+        }
+        if ('B' == schema_type) {
+            this->internal_array->append(new BoolColumn(token));
+        }
+        if ('I' == schema_type) {
+            this->internal_array->append(new IntColumn(token));
+        }
+        if ('F' == schema_type) {
+            this->internal_array->append(new FloatColumn(token));
+        }
+    }
+
+
+    ColumnArray(char* input, char* schema) : ColumnArray() {
         // Returns first token
-        char* token = strtok(serailzied, SERIALIZATION_DELIMETER);
         int curr_col_idx = 0;
 
-        // Keep printing tokens while one of the
-        // delimiters present in str[].
-        while (token != NULL) {
+        size_t size_of_curr_col = 0;
+        memcpy(&size_of_curr_col, input, sizeof(size_t));
+        char* token=input + sizeof(size_t);
 
-            if ('S' == schema[curr_col_idx]) {
-                this->internal_array->append(new StringColumn(token));
-            }
-            if ('B' == schema[curr_col_idx]) {
-                this->internal_array->append(new BoolColumn(token));
-            }
-            if ('I' == schema[curr_col_idx]) {
-                this->internal_array->append(new IntColumn(token));
-            }
-            if ('F' == schema[curr_col_idx]) {
-                this->internal_array->append(new FloatColumn(token));
-            }
+        while (size_of_curr_col != UINT32_MAX) {
+            handleNestedArrayGeneration(token, schema[curr_col_idx]);
 
-
-            token = strtok(NULL, SERIALIZATION_DELIMETER);
+            size_t size_of_next_col = 0;
+            memcpy(&size_of_next_col, token + size_of_curr_col, sizeof(size_t));
+            token = token + size_of_curr_col + sizeof(size_t);
+            size_of_curr_col = size_of_next_col;
+            curr_col_idx++;
         }
+
+    }
+
+//    https://stackoverflow.com/a/29789623
+    char *multi_tok(char *input, char *delimiter) {
+        static char *string;
+        if (input != NULL)
+            string = input;
+
+        if (string == NULL)
+            return string;
+
+        char *end = strstr(string, delimiter);
+        if (end == NULL) {
+            char *temp = string;
+            string = NULL;
+            return temp;
+        }
+
+        char *temp = string;
+
+        *end = '\0';
+        string = end + strlen(delimiter);
+        return temp;
     }
 
     // destructor
@@ -154,17 +185,32 @@ public:
     * @arg other: the other column to check equality to
     */
     bool equals(Object* other) {
-        return this->internal_array->equals(other);
+        if (other == nullptr) return false;
+        ColumnArray *s = dynamic_cast<ColumnArray*>(other);
+        if (s == nullptr) return false;
+        return this->internal_array->equals(s->internal_array);
     }
 
     Serialized serialize_object() override {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
             Serialized curr_col = this->get(i)->serialize_object();
+
+            char schema_size_serailzied[sizeof(size_t)];
+            memset(&schema_size_serailzied, 0, sizeof(size_t));
+            memcpy(&schema_size_serailzied, &curr_col.size, sizeof(size_t));
+
+            interalBuffer.c(schema_size_serailzied, sizeof(size_t));
             interalBuffer.c(curr_col);
             delete [] curr_col.data;
-            interalBuffer.c(SERIALIZATION_DELIMETER);
         }
+
+        size_t max = UINT32_MAX;
+        char schema_size_serailzied[sizeof(size_t)];
+        memset(&schema_size_serailzied, 0, sizeof(size_t));
+        memcpy(&schema_size_serailzied, &max, sizeof(size_t));
+
+        interalBuffer.c(schema_size_serailzied);
 
         return interalBuffer.getSerialization();
     }

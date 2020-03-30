@@ -163,6 +163,7 @@ public:
         schema = new Schema(tok);
 //        TODO be cleaner.
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
+//        this->columns = new ColumnArray();
     }
 
     virtual ~DataFrame() {
@@ -516,6 +517,8 @@ public:
         delete[] schemaSerialized.data;
 
         Serialized colSerialized = this->columns->serialize_object();
+//        For debugging
+//        ColumnArray test(colSerialized.data, this->schema->column_types->internal_list_);
         internalBuffer.c(colSerialized);
         delete[] colSerialized.data;
         return internalBuffer.getSerialization();

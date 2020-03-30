@@ -21,6 +21,8 @@ int testboolMetaArray() {
 
     assert(original.equals(&dup));
 
+    delete []serialized;
+
     return 0;
 }
 
@@ -75,6 +77,7 @@ int testIntMetaArray() {
 int testMetaArray() {
     testboolMetaArray();
     testIntMetaArray();
+    testFloatMetaArray();
 //    testStringMetaArray();
     return 0;
 }
@@ -102,44 +105,69 @@ int testCharArray() {
     CharArray dump(seri);
 
     assert(orig.equals(&dump));
+    delete[] seri;
     return 0;
 }
 
-int main() {
-    testMetaArray();
-    testSchema();
-    testCharArray();
-//    BoolArray testing;
-//    for (int i = 0; i < 11; i++) {
-//        testing.append(true);
-//    }
-//
-//    char* testSerialization = testing.serialize_object();
-//    BoolArray deSeralized(testSerialization);
-//
-//    assert(testing.equals(&deSeralized));
-//
-//    Message messageTesting;
-//    char* serialized = messageTesting.serialize_object();
-//    Message copyTesting(serialized);
-//
-//    assert(messageTesting.target_ == copyTesting.target_);
-//    assert(messageTesting.kind_ == copyTesting.kind_);
-//    assert(messageTesting.id_ == copyTesting.id_);
-//    assert(messageTesting.sender_ == copyTesting.sender_);
-//
-//    IntArray itesting;
-//    for (int i = 0; i < 11; i++) {
-//        itesting.append(1);
-//    }
-//
-//    char* testSerializationI = itesting.serialize_object();
-//    IntArray deSeralizedI(testSerializationI);
-//
-//    assert(itesting.equals(&deSeralizedI));
-//
-//    delete testSerializationI;
-//
+int testIntCol() {
+    IntColumn original;
+    for (int i = 0; i < 100; i++) {
+        original.push_back(i);
+    }
+
+    char *serialized = original.serialize_object().data;
+
+    IntColumn dup(serialized);
+
+    assert(original.equals(&dup));
+    delete[] serialized;
+    return 0;
+}
+
+int testBoolCol() {
+    BoolColumn original;
+    for (int i = 0; i < 100; i++) {
+        original.push_back(i % 1);
+    }
+
+    char *serialized = original.serialize_object().data;
+
+    BoolColumn dup(serialized);
+
+    assert(original.equals(&dup));
+    delete[] serialized;
+    return 0;
+}
+
+int testColumnArray() {
+    ColumnArray originalColArray;
+
+    IntColumn originalIntColumn;
+    for (int i = 0; i < 100; i++) {
+        originalIntColumn.push_back(i);
+    }
+
+    BoolColumn originalBoolColumn;
+    for (int i = 0; i < 100; i++) {
+        originalBoolColumn.push_back(i % 1);
+    }
+
+    originalColArray.append(&originalIntColumn);
+    originalColArray.append(&originalBoolColumn);
+
+    Serialized s = originalColArray.serialize_object();
+    char* serialized = s.data;
+    const char* schema = "IB";
+    ColumnArray dupColArray(serialized, (char*) schema);
+    assert(originalColArray.equals(&dupColArray));
+
+//    delete schema;
+    delete[] serialized;
+
+    return 0;
+}
+
+int testDF() {
     Schema s("B");
     DataFrame testingDF(s);
     testingDF.set(0, 0, false);
@@ -155,4 +183,51 @@ int main() {
 
     assert(testingDF.equals(&deSeralizedDF));
     delete[] testSerializationDF.data;
+    return 0;
+}
+
+int testRegularArrays() {
+    BoolArray testing;
+    for (int i = 0; i < 11; i++) {
+        testing.append(true);
+    }
+
+    char* testSerialization = testing.serialize_object().data;
+    BoolArray deSeralized(testSerialization);
+
+    assert(testing.equals(&deSeralized));
+
+    Message messageTesting;
+    char* serialized = messageTesting.serialize_object().data;
+    Message copyTesting(serialized);
+
+    assert(messageTesting.target_ == copyTesting.target_);
+    assert(messageTesting.kind_ == copyTesting.kind_);
+    assert(messageTesting.id_ == copyTesting.id_);
+    assert(messageTesting.sender_ == copyTesting.sender_);
+
+    IntArray itesting;
+    for (int i = 0; i < 11; i++) {
+        itesting.append(1);
+    }
+
+    char* testSerializationI = itesting.serialize_object();
+    IntArray deSeralizedI(testSerializationI);
+
+    assert(itesting.equals(&deSeralizedI));
+
+    delete testSerializationI;
+
+    return 0;
+}
+
+int main() {
+    testRegularArrays();
+    testMetaArray();
+    testSchema();
+    testCharArray();
+    testIntCol();
+    testBoolCol();
+    testColumnArray();
+    testDF();
 }

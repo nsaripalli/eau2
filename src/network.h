@@ -440,7 +440,7 @@ public:
    */
   virtual void start() {
     Socket serv = Socket();
-    String *serverIP = new String("127.0.0.2"); // Server's "known" address
+    String *serverIP = new String("127.0.0.1"); // Server's "known" address
     int serverPort = 8080;
     int serverFD = serv.socketConnect(serverIP, serverPort);
     printf("[%s %s] Sending ip: %s...\n", name, ip->c_str(), ip->c_str());

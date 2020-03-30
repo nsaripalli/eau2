@@ -26,35 +26,35 @@ public:
     float* vals = new float[SZ];
     float sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
-    DataFrame::fromArray(&main, &kv, SZ, vals);
-    DataFrame::fromScalar(&check, &kv, sum);
+    DataFrame::fromArray(&main, kv, SZ, vals);
+    DataFrame::fromScalar(&check, kv, sum);
   }
  
   void counter() {
-    DataFrame* v = kv.wait_and_get(main);
+    DataFrame* v = kv->wait_and_get(main);
     size_t sum = 0;
     for (size_t i = 0; i < 100*1000; ++i) sum += v->get_float(0,i);
     p("The sum is  ").pln(sum);
-    DataFrame::fromScalar(&verify, &kv, sum);
+    DataFrame::fromScalar(&verify, kv, sum);
   }
  
   void summarizer() {
-    DataFrame* result = kv.wait_and_get(verify);
-    DataFrame* expected = kv.wait_and_get(check);
+    DataFrame* result = kv->wait_and_get(verify);
+    DataFrame* expected = kv->wait_and_get(check);
     pln(expected->get_float(0,0)==result->get_float(0,0) ? "SUCCESS":"FAILURE");
   }
 };
 
 int main(int argc, char *argv[]) {
 
-  Demo producer = Demo(0, "127.0.0.2");
-  Demo counter = Demo(1, "127.0.0.3");
-  Demo summarizer = Demo(2, "127.0.0.4");
-  producer.run_();
+  Demo* producer = new Demo(0, "127.0.0.2");
+  Demo* counter = new Demo(1, "127.0.0.3");
+  Demo* summarizer = new Demo(2, "127.0.0.4");
+  producer->run_();
   std::thread t1 = std::thread(&Demo::run_, counter);
   std::thread t2 = std::thread(&Demo::run_, counter);
   sleep(5);
-  while(!producer.done()); while(!counter.done()); while(!summarizer.done());
+  while(!producer->done()); while(!counter->done()); while(!summarizer->done());
   t1.join();
   t2.join();
 

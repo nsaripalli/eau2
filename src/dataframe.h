@@ -81,6 +81,7 @@ public:
     }
 
     ~KVStore() {
+        printf("WHY HERE\n");
         client_->shutdown();
         delete client_;
     }
@@ -109,7 +110,7 @@ public:
             DataFrame* df = nullptr;
             dfq.push(&df);
             StrBuff buff = StrBuff();
-            buff.c(idx_).c(" ").c(key.idx_).c(" ").c("GET").c(" ").c(key.keyString_.c_str());
+            buff.c("MSG ").c(idx_).c(" ").c(key.idx_).c(" ").c("GET").c(" ").c(key.keyString_.c_str());
             client_->sendMessage(buff.get());
             return df;
         } else {
@@ -512,7 +513,7 @@ public:
 void KVStore::put(Key &k, DataFrame *df) {
     if (k.idx_ != idx_) {
         StrBuff buff = StrBuff();
-        buff.c(idx_).c(" ").c(k.idx_).c(" ").c("PUT").c(" ").c(k.keyString_.c_str()).c(" ").c(df->serialize_object());
+        buff.c("MSG ").c(idx_).c(" ").c(k.idx_).c(" ").c("PUT").c(" ").c(k.keyString_.c_str()).c(" ").c(df->serialize_object());
         client_->sendMessage(buff.get());
     } else {
         map.insert(std::pair<std::string, DataFrame*>(k.keyString_, df));
@@ -523,6 +524,7 @@ void KVStore::use(char *msg) {
     char* tok = strtok(msg, " ");
     int from = atoi(tok);
     tok = strtok(nullptr, " ");
+    printf("TO: %s\n", tok);
     int to = atoi(tok);
     if (to != idx_) { return; }
     tok = strtok(nullptr, " ");
@@ -533,10 +535,11 @@ void KVStore::use(char *msg) {
         DataFrame* df = new DataFrame(tok);
         put(k, df);
     } else if (strcmp(tok, "GET") == 0) { // key string
+        printf("HERE\n");
         tok = strtok(nullptr, " ");
         Key k = Key(tok, to);
         StrBuff buff = StrBuff();
-        buff.c(idx_).c(" ").c(from).c(" ").c("RES").c(" ").c(get(k)->serialize_object());
+        buff.c("MSG ").c(idx_).c(" ").c(from).c(" ").c("RES").c(" ").c(get(k)->serialize_object());
         client_->sendMessage(buff.get());
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = strtok(nullptr, " ");

@@ -17,17 +17,22 @@
  */
 class Application : public Object {
 public:
-  KVStore kv;
+  KVStore *kv;
 
   Application(int idx, const char* ip) {
-    kv = KVStore(idx, ip, 8080);\
+    kv = new KVStore(idx, ip, 8080);
+  }
+
+  ~Application() {
+    printf("HERE TOO?\n");
+    delete kv;
   }
 
   bool done() {
-    return kv.client_->done;
+    return kv->client_->done;
   }
 
-  int this_node() { return kv.idx_; }
+  int this_node() { return kv->idx_; }
 
   virtual void run_() {}
 };
@@ -46,9 +51,9 @@ public:
     int sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
     Key key("triv",0);
-    DataFrame* df = DataFrame::fromArray(&key, &kv, SZ, vals);
+    DataFrame* df = DataFrame::fromArray(&key, kv, SZ, vals);
     assert(df->get_int(0,1) == 1);
-    DataFrame* df2 = kv.wait_and_get(key);
+    DataFrame* df2 = kv->wait_and_get(key);
     for (size_t i = 0; i < SZ; ++i) sum -= df2->get_int(0,i);
     assert(sum==0);
     delete[] vals;

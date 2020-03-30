@@ -7,6 +7,7 @@
 #include "../src/string.h"
 #include "../src/stringArray.h"
 #include "../src/message.h"
+#include "../src/dataframe.h"
 
 int main() {
     BoolArray testing;
@@ -38,4 +39,16 @@ int main() {
 
     assert(itesting.equals(&deSeralized));
 
+    Schema s("B");
+    DataFrame testingDF = DataFrame(s);
+    testingDF.set(0, 0, false);
+    for (int i = 1; i < 17; i++) {
+        testingDF.set(0, i, true);
+    }
+    testingDF.set(0, 17, false);
+
+    char* testSerializationDF = testingDF.serialize_object();
+    DataFrame deSeralizedDF(testSerializationDF);
+
+    assert(testingDF.equals(&deSeralizedDF));
 }

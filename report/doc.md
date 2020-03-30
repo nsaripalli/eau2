@@ -100,3 +100,11 @@ As of 3/22:
   - We have no memory leaks
 
   - We have a base Application class that manages the kv store. 
+
+As of 3/30:
+
+  - we have a distributed kv store
+  
+  - we have a serializable dataframe
+
+  - we demo the client's requested functionality

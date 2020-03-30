@@ -1,8 +1,8 @@
 #include "../src/network.h"
+#include "../src/KVStore.h"
 #include "../src/intMetaArray.h"
 #include "../src/stringMetaArray.h"
 #include "../src/application.h"
-#include "../src/KVStore.h"
 #include <thread>
 
 class Demo : public Application {

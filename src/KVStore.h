@@ -5,8 +5,6 @@
 #include <map>
 #include <queue> 
 
-class DataFrame;
-
 /**
  * Key :: Represents a C++ string key paired with a number to Represents
  * the index of the node the value associated with this key is stored on.

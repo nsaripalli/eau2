@@ -18,6 +18,8 @@
 #include "colArray.h"
 #include "KVStore.h"
 
+class KVStore;
+
 /****************************************************************************
  * DataFrame::
  *

@@ -1,6 +1,6 @@
 build: 
 	g++ -o server -std=c++11 -Wall -g tests/server.cpp -lpthread
-	g++ -o client -std=c++11 -Wall -g tests/client.cpp -lpthread
+	g++ -o m3 -std=c++11 -Wall -g tests/m3.cpp -lpthread
 	g++ -o bench -std=c++11 -Wall -g tests/bench.cpp -lpthread
 	g++ -o test -std=c++11 -Wall -g tests/testing.cpp -lpthread
 	g++ -o app -std=c++11 -Wall -g tests/application_test.cpp -lpthread
@@ -11,17 +11,8 @@ run-server:
 	./server -ip 127.0.0.2 
 	
 run-client:
-	@echo "Starting Client 1..."
-	./client -ip 127.0.0.3 &
-	sleep 4
-	@echo "Starting Client 2..."
-	./client -ip 127.0.0.4 &
-	sleep 4
-	@echo "Starting Client 3..."
-	./client -ip 127.0.0.5 &
-	sleep 4
-	@echo "Starting Client 4..."
-	./client -ip 127.0.0.6
+	@echo "Starting Demo..."
+	./m3
 
 test:
 	./test

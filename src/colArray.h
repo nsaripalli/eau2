@@ -16,7 +16,10 @@ class ColumnArray : public SerializableObject {
 public:
 
     Array* internal_array;
-    const char* SERIALIZATION_DELIMETER = "\uECCF6e缽ȝ`ſǀƈ嘟ͥ\u1941";
+//    const char* SERIALIZATION_DELIMETER = "\uECCF6e缽ȝ`ſǀƈ嘟ͥ\u1941";
+    const char* SERIALIZATION_DELIMETER = "././";
+
+
 
     // default constructor
     ColumnArray() {
@@ -134,7 +137,9 @@ public:
     char *serialize_object() override {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
-            interalBuffer.c(this->get(i)->serialize_object());
+            char* curr_col = this->get(i)->serialize_object();
+            interalBuffer.c(curr_col);
+            delete [] curr_col;
             interalBuffer.c(SERIALIZATION_DELIMETER);
         }
         char* output = interalBuffer.val_;

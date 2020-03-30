@@ -38,6 +38,7 @@ public:
         size_ += step;
         return *this;
     }
+
     StrBuff& c(String &s) { return c(s.c_str());  }
     StrBuff& c(size_t v) { return c(std::to_string(v).c_str());  } // Cpp
 

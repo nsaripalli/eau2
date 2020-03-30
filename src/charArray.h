@@ -246,6 +246,7 @@ public:
     }  // Returns the hash code value for this list.
 
     char * serialize_object() {
+//        char* totalBytesArray = new char[2];
         char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(char))];
         char* bytesCurrent_max_index = totalBytesArray;
         char* bytesArray_size = totalBytesArray + sizeof(current_max_index);

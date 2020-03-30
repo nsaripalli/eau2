@@ -101,4 +101,19 @@ public:
         }
         return totalBytesArray;
     }
+
+    bool equals(Object *other) override {
+        if (other == nullptr) return false;
+        IntMetaArray *s = dynamic_cast<IntMetaArray*>(other);
+        if (s == nullptr) return false;
+        if ((this->arrsNum_ == s->arrsNum_) && (this->nextIndex_ == s->nextIndex_)) {
+            for (int i =0 ; i < arrsNum_; i++) {
+                if (memcmp(this->arrs_[i], s->arrs_[i], sizeof(int) * arrSize_) != 0) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 };

@@ -21,4 +21,4 @@ SET(CMAKE_EXE_LINKER_FLAGS  "${CMAKE_EXE_LINKER_FLAGS} ${GCC_COVERAGE_LINK_FLAGS
 find_package(Threads REQUIRED)
 
 
-add_executable(main tests/testing.cpp)
+add_executable(main tests/testSerialization.cpp)

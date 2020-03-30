@@ -157,7 +157,8 @@ public:
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
         schema = new Schema(serialized + sizeof(size_t));
-        columns = new ColumnArray(serialized + sizeof(size_t) + size_of_schema);
+//        TODO be cleaner.
+        columns = new ColumnArray(serialized + sizeof(size_t) + size_of_schema, schema->column_types->internal_list_);
     }
 
     virtual ~DataFrame() {
@@ -500,6 +501,7 @@ public:
         char *schemaSerialized = this->schema->serialize_object();
         StrBuff internalBuffer;
         size_t schema_size = sizeof(schemaSerialized);
+//        TODO I do not trust this
         internalBuffer.c(schema_size);
         internalBuffer.c(schemaSerialized);
         delete[] schemaSerialized;
@@ -510,6 +512,8 @@ public:
         internalBuffer.val_ = nullptr;
         return output;
     }
+
+    bool equals(Object *other) override;
 };
 
 void KVStore::put(Key &k, DataFrame *df) {
@@ -548,4 +552,14 @@ void KVStore::use(char *msg) {
         *(dfq.front()) = new DataFrame(tok);
         dfq.pop();
     }
+
+
+}
+
+bool DataFrame::equals(Object *other) {
+    if (other == nullptr) return false;
+    DataFrame *s = dynamic_cast<DataFrame*>(other);
+    if (s == nullptr) return false;
+    return this->columns->equals(s->columns) &&
+           this->schema->equals(s->schema);
 }

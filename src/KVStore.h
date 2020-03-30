@@ -66,6 +66,16 @@ public:
         delete client_;
     }
     
+    /**
+     * Parses out and deals with the three networking functionalities
+     * of a KV Store:
+     * 1. Adding a dataframe to the kv store
+     * 2. Returning a dataframe from the store
+     * 3. Accepting a returned dataframe from another store
+     * 
+     * All msgs match the following structure:
+     * "[from idx] [to idx] [verb] [specifics... (relavant key, value info)]"
+     */
     void use(char* msg) {
         char* tok = strtok(msg, " ");
         int from = atoi(tok);
@@ -73,19 +83,19 @@ public:
         int to = atoi(tok);
         if (to != idx_) { return; }
         tok = strtok(nullptr, " ");
-        if (strcmp(tok, "PUT") == 0) {
+        if (strcmp(tok, "PUT") == 0) { // key string, df
             tok = strtok(nullptr, " ");
             Key k = Key(tok, to);
             tok = strtok(nullptr, " ");
             DataFrame* df = new DataFrame(tok);
             put(k, df);
-        } else if (strcmp(tok, "GET") == 0) {
+        } else if (strcmp(tok, "GET") == 0) { // key string
             tok = strtok(nullptr, " ");
             Key k = Key(tok, to);
             StrBuff buff = StrBuff();
             buff.c(idx_).c(" ").c(from).c(" ").c("RES").c(" ").c(get(k)->serialize_object());
             client_->sendMessage(buff.get());
-        } else if (strcmp(tok, "RES") == 0) {
+        } else if (strcmp(tok, "RES") == 0) { // df
             tok = strtok(nullptr, " ");
             *(dfq.front()) = new DataFrame(tok);
             dfq.pop();

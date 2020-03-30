@@ -3,6 +3,7 @@
 #include "../src/stringMetaArray.h"
 #include "../src/application.h"
 #include "../src/KVStore.h"
+#include <thread>
 
 class Demo : public Application {
 public:
@@ -23,7 +24,7 @@ public:
   void producer() {
     size_t SZ = 100*1000;
     float* vals = new float[SZ];
-    double sum = 0;
+    float sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
     DataFrame::fromArray(&main, &kv, SZ, vals);
     DataFrame::fromScalar(&check, &kv, sum);
@@ -46,7 +47,16 @@ public:
 
 int main(int argc, char *argv[]) {
 
-  // TODO run demo on 3 different threads with 3 ips that are not 127.0.0.1
+  Demo producer = Demo(0, "127.0.0.2");
+  Demo counter = Demo(1, "127.0.0.3");
+  Demo summarizer = Demo(2, "127.0.0.4");
+  producer.run_();
+  std::thread t1 = std::thread(&Demo::run_, counter);
+  std::thread t2 = std::thread(&Demo::run_, counter);
+  sleep(5);
+  while(!producer.done()); while(!counter.done()); while(!summarizer.done());
+  t1.join();
+  t2.join();
 
   return 0;
 }

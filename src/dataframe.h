@@ -365,6 +365,18 @@ public:
         return df;
     }
 
+    /**
+     * Takes a float and creates a new one by one dataframe.
+    **/
+    static DataFrame* fromScalar(Key* key, KVStore* kv, float scalar) {
+        Schema *s = new Schema("F");
+        DataFrame* df = new DataFrame(*s);
+        df->set(0, 0, scalar);
+        delete s;
+        kv->put(*key, df);
+        return df;
+    }
+
     char *serialize_object() {
         char* colSerialized = this->columns->serialize_object();
         char* schemaSerialized = this->schema->serialize_object();

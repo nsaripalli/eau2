@@ -80,7 +80,7 @@ public:
         memcpy(totalBytesArray + sizeof(arrsNum_), &nextIndex_, sizeof(nextIndex_));
         for (int i =0 ; i < arrsNum_; i++) {
             memcpy(totalBytesArray + sizeof(arrsNum_) + sizeof(nextIndex_) + (i * sizeof(bool) * arrSize_),
-                   arrs_[i], sizeof(int) * arrSize_);
+                   arrs_[i], sizeof(bool) * arrSize_);
         }
         return totalBytesArray;
     }

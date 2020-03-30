@@ -54,7 +54,9 @@ int main(int argc, char *argv[]) {
   std::thread t1 = std::thread(&Demo::run_, counter);
   std::thread t2 = std::thread(&Demo::run_, counter);
   sleep(5);
-  while(!producer->done()); while(!counter->done()); while(!summarizer->done());
+  while(!producer->done()); 
+  while(!counter->done()); 
+  while(!summarizer->done());
   t1.join();
   t2.join();
 

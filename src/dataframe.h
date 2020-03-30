@@ -39,7 +39,7 @@ public:
      * Creates a key with the c++ string built to the given
      * key value and the index set to the given index.
      */
-    Key(const char* k, int i) {
+    Key(const char *k, int i) {
         keyString_ = std::string(k);
         idx_ = 0;
     }
@@ -57,9 +57,9 @@ class DataFrame;
 class KVStore : public User {
 public:
     int idx_;
-    std::map<std::string, DataFrame*> map;
-    Client* client_;
-    std::queue<DataFrame**> dfq;
+    std::map<std::string, DataFrame *> map;
+    Client *client_;
+    std::queue<DataFrame **> dfq;
 
     /**
      * Default constructor, setting the KV store to be on node 0
@@ -74,7 +74,7 @@ public:
     /**
      * Creates a KV store associated with node `idx`
      */
-    KVStore(int idx, const char* ip, int port) {
+    KVStore(int idx, const char *ip, int port) {
         idx_ = idx;
         client_ = new Client(ip, port, this);
         client_->bgStart();
@@ -96,7 +96,7 @@ public:
      * All msgs match the following structure:
      * "[from idx] [to idx] [verb] [specifics... (relavant key, value info)]"
      */
-    void use(char* msg);
+    void use(char *msg);
 
     /**
      * Returns the value associated with the key,
@@ -105,9 +105,9 @@ public:
      * Returns a pointer initially null that will be
      * updated to the value when complete.
      */
-    DataFrame* get(Key& key) {
+    DataFrame *get(Key &key) {
         if (key.idx_ != idx_) {
-            DataFrame* df = nullptr;
+            DataFrame *df = nullptr;
             dfq.push(&df);
             StrBuff buff = StrBuff();
             buff.c("MSG ").c(idx_).c(" ").c(key.idx_).c(" ").c("GET").c(" ").c(key.keyString_.c_str());
@@ -123,8 +123,8 @@ public:
      * blocking if it needs to request the value
      * to another KV Store (node)
      */
-    DataFrame* wait_and_get(Key& key) {
-        DataFrame* df = get(key);
+    DataFrame *wait_and_get(Key &key) {
+        DataFrame *df = get(key);
         while (!df);
         return df;
     }
@@ -134,7 +134,7 @@ public:
      * with the given key, associating the value with the given
      * key. non-blocking.
      */
-    void put(Key& k, DataFrame* df);
+    void put(Key &k, DataFrame *df);
 };
 
 /****************************************************************************
@@ -153,7 +153,7 @@ public:
     /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
 
-    DataFrame (char* serialized) {
+    DataFrame(char *serialized) {
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
         schema = new Schema(serialized + sizeof(size_t));
@@ -171,7 +171,7 @@ public:
     /** Create a data frame from a schema and columns. All columns are created
       * empty. */
     DataFrame(Schema &schema) {
-        this->schema =  new Schema(schema);
+        this->schema = new Schema(schema);
         this->columns = new ColumnArray();
 
 //        Iterate through each of the elements in the row and give them to Fielder
@@ -431,9 +431,9 @@ public:
     /**
      * Takes a Float Array and creates a new one column dataframe.
     **/
-    static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, float* vals) {
+    static DataFrame *fromArray(Key *key, KVStore *kv, size_t SZ, float *vals) {
         Schema *s = new Schema("F");
-        DataFrame* df = new DataFrame(*s);
+        DataFrame *df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
         }
@@ -445,9 +445,9 @@ public:
     /**
      * Takes an int Array and creates a new one column dataframe.
     **/
-    static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, int* vals) {
+    static DataFrame *fromArray(Key *key, KVStore *kv, size_t SZ, int *vals) {
         Schema *s = new Schema("I");
-        DataFrame* df = new DataFrame(*s);
+        DataFrame *df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
         }
@@ -459,9 +459,9 @@ public:
     /**
      * Takes a bool Array and creates a new one column dataframe.
     **/
-    static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, bool* vals) {
+    static DataFrame *fromArray(Key *key, KVStore *kv, size_t SZ, bool *vals) {
         Schema *s = new Schema("B");
-        DataFrame* df = new DataFrame(*s);
+        DataFrame *df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
         }
@@ -473,9 +473,9 @@ public:
     /**
      * Takes a String Array and creates a new one column dataframe.
     **/
-    static DataFrame* fromArray(Key* key, KVStore* kv, size_t SZ, String** vals) {
+    static DataFrame *fromArray(Key *key, KVStore *kv, size_t SZ, String **vals) {
         Schema *s = new Schema("S");
-        DataFrame* df = new DataFrame(*s);
+        DataFrame *df = new DataFrame(*s);
         for (size_t i = 0; i < SZ; i++) {
             df->set(0, i, vals[i]);
         }
@@ -487,9 +487,9 @@ public:
     /**
      * Takes a float and creates a new one by one dataframe.
     **/
-    static DataFrame* fromScalar(Key* key, KVStore* kv, float scalar) {
+    static DataFrame *fromScalar(Key *key, KVStore *kv, float scalar) {
         Schema *s = new Schema("F");
-        DataFrame* df = new DataFrame(*s);
+        DataFrame *df = new DataFrame(*s);
         df->set(0, 0, scalar);
         delete s;
         kv->put(*key, df);
@@ -497,13 +497,15 @@ public:
     }
 
     char *serialize_object() {
-        char* colSerialized = this->columns->serialize_object();
-        char* schemaSerialized = this->schema->serialize_object();
+        char *schemaSerialized = this->schema->serialize_object();
         StrBuff internalBuffer;
         size_t schema_size = sizeof(schemaSerialized);
         internalBuffer.c(schema_size);
         internalBuffer.c(schemaSerialized);
+        delete[] schemaSerialized;
+        char *colSerialized = this->columns->serialize_object();
         internalBuffer.c(colSerialized);
+        delete[] colSerialized;
         char* output = internalBuffer.val_;
         internalBuffer.val_ = nullptr;
         return output;
@@ -516,12 +518,12 @@ void KVStore::put(Key &k, DataFrame *df) {
         buff.c("MSG ").c(idx_).c(" ").c(k.idx_).c(" ").c("PUT").c(" ").c(k.keyString_.c_str()).c(" ").c(df->serialize_object());
         client_->sendMessage(buff.get());
     } else {
-        map.insert(std::pair<std::string, DataFrame*>(k.keyString_, df));
+        map.insert(std::pair<std::string, DataFrame *>(k.keyString_, df));
     }
 }
 
 void KVStore::use(char *msg) {
-    char* tok = strtok(msg, " ");
+    char *tok = strtok(msg, " ");
     int from = atoi(tok);
     tok = strtok(nullptr, " ");
     printf("TO: %s\n", tok);
@@ -532,7 +534,7 @@ void KVStore::use(char *msg) {
         tok = strtok(nullptr, " ");
         Key k = Key(tok, to);
         tok = strtok(nullptr, " ");
-        DataFrame* df = new DataFrame(tok);
+        DataFrame *df = new DataFrame(tok);
         put(k, df);
     } else if (strcmp(tok, "GET") == 0) { // key string
         printf("HERE\n");

@@ -23,12 +23,21 @@ public:
         internal_array = new Array();
     }
 
-    StringArray(char *other) {
-        char *idx = other;
-        while (*idx) {
-            String *currStringTok = new String(idx);
-            this->append(currStringTok);
-            idx += strlen(idx) + 1;
+    StringArray(char *input) : StringArray() {
+        int curr_col_idx = 0;
+
+        size_t size_of_curr_col = 0;
+        memcpy(&size_of_curr_col, input, sizeof(size_t));
+        char* token=input + sizeof(size_t);
+
+        while (size_of_curr_col != UINT32_MAX) {
+            this->internal_array->append(new String(token));
+
+            size_t size_of_next_col = 0;
+            memcpy(&size_of_next_col, token + size_of_curr_col, sizeof(size_t));
+            token = token + size_of_curr_col + sizeof(size_t);
+            size_of_curr_col = size_of_next_col;
+            curr_col_idx++;
         }
     }
 
@@ -132,15 +141,33 @@ public:
     * @arg other: the other string to check equality to
     */
     bool equals(Object *other) {
-        return this->internal_array->equals(other);
+        if (other == nullptr) return false;
+        StringArray *s = dynamic_cast<StringArray*>(other);
+        if (s == nullptr) return false;
+        return this->internal_array->equals(s->internal_array);
     }
 
 
     Serialized serialize_object() {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
-            interalBuffer.c(this->get(i)->serialize_object());
+            Serialized curr_col = this->get(i)->serialize_object();
+            char schema_size_serailzied[sizeof(size_t)];
+            memset(&schema_size_serailzied, 0, sizeof(size_t));
+            memcpy(&schema_size_serailzied, &curr_col.size, sizeof(size_t));
+
+            interalBuffer.c(schema_size_serailzied, sizeof(size_t));
+            interalBuffer.c(curr_col);
+            delete [] curr_col.data;
         }
+
+        size_t max = UINT32_MAX;
+        char schema_size_serailzied[sizeof(size_t)];
+        memset(&schema_size_serailzied, 0, sizeof(size_t));
+        memcpy(&schema_size_serailzied, &max, sizeof(size_t));
+
+        interalBuffer.c(schema_size_serailzied);
+
         return interalBuffer.getSerialization();
     }
 };

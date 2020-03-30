@@ -43,7 +43,6 @@ public:
 
 
     ColumnArray(char* input, char* schema) : ColumnArray() {
-        // Returns first token
         int curr_col_idx = 0;
 
         size_t size_of_curr_col = 0;

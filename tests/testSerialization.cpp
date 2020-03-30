@@ -58,27 +58,43 @@ int testIntMetaArray() {
     return 0;
 }
 
-//int testStringMetaArray() {
-//    StringMetaArray original;
-//    String test("test");
-//    for (int i = 0; i < 100; i++) {
-//        original.push_back(&test);
-//    }
-//
-//    char* serialized = original.serialize_object();
-//
-//    StringMetaArray dup(serialized);
-//    assert(original.equals(&dup));
-//
-//    delete[] serialized;
-//    return 0;
-//}
+int testStringMetaArray() {
+    StringMetaArray original;
+    String test("test");
+    for (int i = 0; i < 100; i++) {
+        original.push_back(&test);
+    }
+
+    char* serialized = original.serialize_object().data;
+
+    StringMetaArray dup(serialized);
+    assert(original.equals(&dup));
+
+    delete[] serialized;
+    return 0;
+}
+
+int testStringArray() {
+    StringArray original;
+    String test("test");
+    for (int i = 0; i < 100; i++) {
+        original.append(&test);
+    }
+
+    char* serialized = original.serialize_object().data;
+
+    StringArray dup(serialized);
+    assert(original.equals(&dup));
+
+    delete[] serialized;
+    return 0;
+}
 
 int testMetaArray() {
     testboolMetaArray();
     testIntMetaArray();
     testFloatMetaArray();
-//    testStringMetaArray();
+    testStringMetaArray();
     return 0;
 }
 
@@ -230,4 +246,5 @@ int main() {
     testBoolCol();
     testColumnArray();
     testDF();
+    testStringArray();
 }

@@ -86,7 +86,8 @@ public:
 
     Serialized serialize_object() {
         String cpy(*this);
-        Serialized out = {cpy.size_, cpy.steal()};
+//        +1 for the null terminator
+        Serialized out = {cpy.size_ + 1, cpy.steal()};
         return out;
     }
 };

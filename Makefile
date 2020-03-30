@@ -8,7 +8,7 @@ build:
 
 run-server: 
 	@echo "Starting Server..."
-	./server -ip 127.0.0.2 
+	./server -ip 127.0.0.1 
 	
 run-client:
 	@echo "Starting Demo..."

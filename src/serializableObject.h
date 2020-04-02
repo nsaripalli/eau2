@@ -1,6 +1,5 @@
 #pragma once
 
-#include "strBuff.h"
 #include "object.h"
 
 class SerializableObject: public Object {

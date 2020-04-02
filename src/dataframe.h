@@ -61,7 +61,7 @@ public:
     Client *client_;
     std::queue<DataFrame **> dfq; // Keeps track of the pointers to update
 
-    const char* DELIMITER = "H܀΁c廟bR`Ᵹ";
+    const char* DELIMITER = " Hc廟bRꝽ ";
 
     /**
      * Default constructor, setting the KV store to be on node 0

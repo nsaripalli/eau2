@@ -149,7 +149,7 @@ public:
         pad = &pad->c(*prefix->get());
 
         String* output = pad->c(data->c_str(), data->size()).get();
-        printf("Out to %d: %s\n", recFD, output->c_str());
+        // printf("Out to %d: %s\n", recFD, output->c_str());
         int out = write(recFD, output->c_str(), output->size());
 
         delete prefix;
@@ -485,7 +485,7 @@ public:
         
       } else if (strcmp(tok, "MSG") == 0) {
         // print the message after "MSG "
-        printf("[Client %s] Message Received: \"%s\"\n", ip->c_str(), &(received->c_str()[4])); 
+        // printf("[Client %s] Message Received: \"%s\"\n", ip->c_str(), &(received->c_str()[4])); 
         user_->use(&(received->c_str()[4]));
       } else if (strcmp(tok, "END") == 0) {
         if (bg) {

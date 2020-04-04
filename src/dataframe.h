@@ -538,7 +538,6 @@ void KVStore::put(Key &k, DataFrame *df) {
 }
 
 void KVStore::use(char *msg) {
-    printf("MSG use: %s\n", msg);
     char *tok = strtok(msg, DELIMITER);
     int from = atoi(tok);
     tok = strtok(nullptr, DELIMITER);

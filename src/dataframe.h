@@ -24,6 +24,30 @@
 #include <queue>
 //#include "KVStore.h"
 
+
+char *multi_tok(char *input, const char *delimiter) {
+    static char *string;
+    if (input != NULL)
+        string = input;
+
+    if (string == NULL)
+        return string;
+
+    char *end = strstr(string, delimiter);
+    if (end == NULL) {
+        char *temp = string;
+        string = NULL;
+        return temp;
+    }
+
+    char *temp = string;
+
+    *end = '\0';
+    string = end + strlen(delimiter);
+    return temp;
+}
+
+
 /**
  * Key :: Represents a C++ string key paired with a number to Represents
  * the index of the node the value associated with this key is stored on.
@@ -83,7 +107,6 @@ public:
     }
 
     ~KVStore() {
-        printf("WHY HERE\n");
         client_->shutdown();
         delete client_;
     }
@@ -112,7 +135,7 @@ public:
             DataFrame *df = nullptr;
             dfq.push(&df);
             StrBuff buff = StrBuff();
-            buff.c("MSG").c(DELIMITER).c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(key.keyString_.c_str());
+            buff.c("MSG ").c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(key.keyString_.c_str());
             client_->sendMessage(buff.get());
             return df;
         } else {
@@ -530,7 +553,7 @@ public:
 void KVStore::put(Key &k, DataFrame *df) {
     if (k.idx_ != idx_) {
         StrBuff buff = StrBuff();
-        buff.c("MSG").c(DELIMITER).c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("PUT").c(DELIMITER).c(k.keyString_.c_str()).c(DELIMITER).c(df->serialize_object());
+        buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("PUT").c(DELIMITER).c(k.keyString_.c_str()).c(DELIMITER).c(df->serialize_object());
         client_->sendMessage(buff.get());
     } else {
         map.insert(std::pair<std::string, DataFrame *>(k.keyString_, df));
@@ -538,27 +561,30 @@ void KVStore::put(Key &k, DataFrame *df) {
 }
 
 void KVStore::use(char *msg) {
-    char *tok = strtok(msg, DELIMITER);
+    char *tok = multi_tok(msg, DELIMITER);
+    printf("FROM: %s\n", tok);
     int from = atoi(tok);
-    tok = strtok(nullptr, DELIMITER);
+    tok = multi_tok(nullptr, DELIMITER);
     printf("TO: %s\n", tok);
     int to = atoi(tok);
+    tok = multi_tok(nullptr, DELIMITER);
+    printf("HEADER: %s\n", tok);
     if (to != idx_) { return; }
-    tok = strtok(nullptr, DELIMITER);
     if (strcmp(tok, "PUT") == 0) { // key string, df
-        tok = strtok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, to);
-        tok = strtok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, DELIMITER);
         DataFrame *df = new DataFrame(tok);
         put(k, df);
     } else if (strcmp(tok, "GET") == 0) { // key string
-        tok = strtok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, to);
         StrBuff buff = StrBuff();
         buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("RES").c(DELIMITER).c(get(k)->serialize_object());
         client_->sendMessage(buff.get());
     } else if (strcmp(tok, "RES") == 0) { // df
-        tok = strtok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, DELIMITER);
+        printf("HERE THO\n");
         *(dfq.front()) = new DataFrame(tok);
         dfq.pop();
     }

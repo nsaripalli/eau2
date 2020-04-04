@@ -538,6 +538,7 @@ void KVStore::put(Key &k, DataFrame *df) {
 }
 
 void KVStore::use(char *msg) {
+    printf("MSG use: %s\n", msg);
     char *tok = strtok(msg, DELIMITER);
     int from = atoi(tok);
     tok = strtok(nullptr, DELIMITER);
@@ -552,7 +553,6 @@ void KVStore::use(char *msg) {
         DataFrame *df = new DataFrame(tok);
         put(k, df);
     } else if (strcmp(tok, "GET") == 0) { // key string
-        printf("HERE\n");
         tok = strtok(nullptr, DELIMITER);
         Key k = Key(tok, to);
         StrBuff buff = StrBuff();

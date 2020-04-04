@@ -148,7 +148,7 @@ public:
         }
         pad = &pad->c(*prefix->get());
 
-        String* output = pad->c(*data).get();
+        String* output = pad->c(data->c_str(), data->size()).get();
         printf("Out to %d: %s\n", recFD, output->c_str());
         int out = write(recFD, output->c_str(), output->size());
 

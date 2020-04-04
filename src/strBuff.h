@@ -43,8 +43,13 @@ public:
     }
 
     StrBuff& c(String &s) { return c(s.c_str());  }
+
     StrBuff& c(size_t v) {
         return c(convert_size_to_string(v));
+    } // Cpp
+
+    StrBuff& c(int v) {
+        return c(std::to_string(v).c_str());
     } // Cpp
 
     StrBuff c(Serialized s) {

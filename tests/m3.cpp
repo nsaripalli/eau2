@@ -37,6 +37,7 @@ public:
   }
  
   void summarizer() {
+    sleep(10);
     DataFrame* result = kv->wait_and_get(verify);
     DataFrame* expected = kv->wait_and_get(check);
     pln(expected->get_float(0,0)==result->get_float(0,0) ? "SUCCESS":"FAILURE");
@@ -50,7 +51,7 @@ int main(int argc, char *argv[]) {
   Demo* summarizer = new Demo(2, "127.0.0.4");
   producer->run_();
   std::thread t1 = std::thread(&Demo::run_, counter);
-  std::thread t2 = std::thread(&Demo::run_, counter);
+  std::thread t2 = std::thread(&Demo::run_, summarizer);
   sleep(5);
   while(!producer->done()); 
   while(!counter->done()); 

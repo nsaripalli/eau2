@@ -298,7 +298,17 @@ int testRegularArrays() {
     return 0;
 }
 
+int testNullEscaper() {
+    const char* data = "THIS IS A TEST TO SEE|| |IF WHAT|||| WE H\0\0AVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
+    Serialized input = {76, const_cast<char *>(data)};
+    Serialized converted = StrBuff::convert_to_escaped(input);
+    Serialized output = StrBuff::convert_back_to_original(converted.data);
+    assert(output.size == 76);
+    assert(memcmp(output.data, data, 76 * sizeof(char)) == 0);
+}
+
 int main() {
+    testNullEscaper();
     testRegularArrays();
     testMetaArray();
     testSchema();

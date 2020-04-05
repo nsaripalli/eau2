@@ -25,30 +25,35 @@ public:
         if (step + size_ < capacity_) return;
         capacity_ *= 2;
         if (step + size_ >= capacity_) capacity_ += step;
-        char* oldV = val_;
+        char *oldV = val_;
         val_ = new char[capacity_];
         memcpy(val_, oldV, size_);
         delete[] oldV;
     }
-    StrBuff& c(const char* str) {
+
+    StrBuff &c(const char *str) {
         size_t step = strlen(str);
         return c(str, step);
     }
 
-    StrBuff& c(const char* str, size_t step) {
+    StrBuff &c(const char *str, size_t step) {
         grow_by_(step);
-        memcpy(val_+size_, str, step);
+        memcpy(val_ + size_, str, step);
         size_ += step;
         return *this;
     }
 
-    StrBuff& c(String &s) { return c(s.c_str());  }
+    StrBuff &cc(const char str) {
+        return this->c(&str, sizeof(char));
+    }
 
-    StrBuff& c(size_t v) {
+    StrBuff &c(String &s) { return c(s.c_str()); }
+
+    StrBuff &c(size_t v) {
         return c(convert_size_to_string(v));
     } // Cpp
 
-    StrBuff& c(int v) {
+    StrBuff &c(int v) {
         return c(std::to_string(v).c_str());
     } // Cpp
 
@@ -56,11 +61,11 @@ public:
         return c(s.data, s.size);
     }
 
-    static const char* convert_size_to_string(size_t v) {
+    static const char *convert_size_to_string(size_t v) {
         return std::to_string(v).c_str();
     }
 
-    String* get() {
+    String *get() {
         assert(val_ != nullptr); // can be called only once
         grow_by_(1);     // ensure space for terminator
         val_[size_] = 0; // terminate
@@ -73,5 +78,52 @@ public:
         Serialized out = {this->size_, this->val_};
         this->val_ = nullptr; // val_ was consumed above
         return out;
+    }
+
+    Serialized static convert_to_escaped(Serialized input) {
+        StrBuff output;
+        for (size_t i = 0; i < input.size; i++) {
+            switch (input.data[i]) {
+                case '\0':
+                    output.c("|9", sizeof(char) * 2);
+                    break;
+                case '|':
+                    output.c("||", sizeof(char) * 2);
+                    break;
+                default:
+                    output.cc(input.data[i]);
+                    break;
+            }
+        }
+        output.cc('\0');
+        return output.getSerialization();
+    }
+
+    Serialized static convert_back_to_original(char *input) {
+        StrBuff output;
+        size_t curr_idx = 0;
+        while (input[curr_idx] != '\0') {
+            switch (input[curr_idx]) {
+                case '|':
+                    if (input[curr_idx + 1] == '|') {
+                        output.cc('|');
+                        curr_idx++;
+                    } else if (input[curr_idx + 1] == '9') {
+                        output.cc('\0');
+                        curr_idx++;
+                    }
+                    break;
+                case '\0':
+//                    We should never be here.
+                    assert(false);
+                    break;
+                default:
+                    output.cc(input[curr_idx]);
+                    break;
+            }
+            curr_idx++;
+        }
+//        output.cc('\0');
+        return output.getSerialization();
     }
 };

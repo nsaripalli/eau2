@@ -179,7 +179,13 @@ public:
     /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
 
-    DataFrame(char *serialized) {
+    DataFrame(char *input) {
+        Serialized raw = StrBuff::convert_back_to_original(input);
+        puts("IN SERIALIATION");
+        fflush(stdout);
+        char* serialized = raw.data;
+        printf("%zu\n", raw.size);
+
         const char* dup = "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
@@ -539,27 +545,28 @@ public:
     }
 
     Serialized serialize_object() {
-//        Serialized schemaSerialized = this->schema->serialize_object();
-//        size_t schema_size = schemaSerialized.size;
-////        Schema test(schemaSerialized);
-//
-//        char schema_size_serailzied[sizeof(size_t)];
-//        memset(&schema_size_serailzied, 0, sizeof(size_t));
-//        memcpy(&schema_size_serailzied, &schema_size, sizeof(size_t));
-//
-//        StrBuff internalBuffer;
-//        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
-//        internalBuffer.c(schemaSerialized);
-//        delete[] schemaSerialized.data;
-//
-//        Serialized colSerialized = this->columns->serialize_object();
-////        For debugging
-////        ColumnArray test(colSerialized.data, this->schema->column_types->internal_list_);
-//        internalBuffer.c(colSerialized);
-//        delete[] colSerialized.data;
-//        return internalBuffer.getSerialization();
+        Serialized schemaSerialized = this->schema->serialize_object();
+        size_t schema_size = schemaSerialized.size;
+//        Schema test(schemaSerialized);
 
-        Serialized out = {76, "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT"};
+        char schema_size_serailzied[sizeof(size_t)];
+        memset(&schema_size_serailzied, 0, sizeof(size_t));
+        memcpy(&schema_size_serailzied, &schema_size, sizeof(size_t));
+
+        StrBuff internalBuffer;
+        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
+        internalBuffer.c(schemaSerialized);
+        delete[] schemaSerialized.data;
+
+        Serialized colSerialized = this->columns->serialize_object();
+//        For debugging
+//        ColumnArray test(colSerialized.data, this->schema->column_types->internal_list_);
+        internalBuffer.c(colSerialized);
+        delete[] colSerialized.data;
+        Serialized tmp = internalBuffer.getSerialization();
+
+//        Serialized internalBuffer = {76, "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT"};
+        Serialized out = StrBuff::convert_to_escaped(tmp);
         return out;
     }
 

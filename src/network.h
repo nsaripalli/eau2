@@ -360,7 +360,7 @@ public:
    */
   virtual void onReceive_(String* received) {
     if (!received->equals(mt)) {
-      printf("[%s %s] Received: %s\n", name, ip->c_str(), received->c_str());
+      printf("[%s %s] Received: %.100s\n", name, ip->c_str(), received->c_str());
       if (cds->size() > 1) {
         ips->c(","); // token to seperate ips
       }
@@ -506,7 +506,7 @@ public:
   void sendMessage(String* msg) {
     for (size_t i=0; i < ips->size(); i++) {
       Socket rec = Socket();
-      printf("[%s %s] Sending msg to %s: %s\n", name, ip->c_str(), ips->get(i)->c_str(), msg->c_str());
+      printf("[%s %s] Sending msg to %s: %.100s\n", name, ip->c_str(), ips->get(i)->c_str(), msg->c_str());
       int recFD = rec.socketConnect(ips->get(i), 8080);
       sock->sendAll(msg, recFD);
     }

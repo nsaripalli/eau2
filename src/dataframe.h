@@ -85,7 +85,7 @@ public:
     Client *client_;
     std::queue<DataFrame **> dfq; // Keeps track of the pointers to update
 
-    const char* DELIMITER = " Hc廟bRꝽɴ굃d獪|㕚 ";
+    const char *DELIMITER = "Hc廟bRꝽɴ굃d獪|㕚";
 
     /**
      * Default constructor, setting the KV store to be on node 0
@@ -135,7 +135,8 @@ public:
             DataFrame *df = nullptr;
             dfq.push(&df);
             StrBuff buff = StrBuff();
-            buff.c("MSG ").c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(key.keyString_.c_str());
+            buff.c("MSG ").c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
+                    key.keyString_.c_str());
             client_->sendMessage(buff.get());
             return df;
         } else {
@@ -179,14 +180,14 @@ public:
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
 
     DataFrame(char *serialized) {
+        const char* dup = "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
-        char* tok=serialized + sizeof(size_t);
+        char *tok = serialized + sizeof(size_t);
 
         schema = new Schema(tok);
 //        TODO be cleaner.
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
-//        this->columns = new ColumnArray();
     }
 
     virtual ~DataFrame() {
@@ -525,26 +526,41 @@ public:
         return df;
     }
 
+    /**
+     * Takes a int and creates a new one by one dataframe.
+    **/
+    static DataFrame *fromScalar(Key *key, KVStore *kv, int scalar) {
+        Schema *s = new Schema("I");
+        DataFrame *df = new DataFrame(*s);
+        df->set(0, 0, scalar);
+        delete s;
+        kv->put(*key, df);
+        return df;
+    }
+
     Serialized serialize_object() {
-        Serialized schemaSerialized = this->schema->serialize_object();
-        size_t schema_size = schemaSerialized.size;
-//        Schema test(schemaSerialized);
+//        Serialized schemaSerialized = this->schema->serialize_object();
+//        size_t schema_size = schemaSerialized.size;
+////        Schema test(schemaSerialized);
+//
+//        char schema_size_serailzied[sizeof(size_t)];
+//        memset(&schema_size_serailzied, 0, sizeof(size_t));
+//        memcpy(&schema_size_serailzied, &schema_size, sizeof(size_t));
+//
+//        StrBuff internalBuffer;
+//        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
+//        internalBuffer.c(schemaSerialized);
+//        delete[] schemaSerialized.data;
+//
+//        Serialized colSerialized = this->columns->serialize_object();
+////        For debugging
+////        ColumnArray test(colSerialized.data, this->schema->column_types->internal_list_);
+//        internalBuffer.c(colSerialized);
+//        delete[] colSerialized.data;
+//        return internalBuffer.getSerialization();
 
-        char schema_size_serailzied[sizeof(size_t)];
-        memset(&schema_size_serailzied, 0, sizeof(size_t));
-        memcpy(&schema_size_serailzied, &schema_size, sizeof(size_t));
-
-        StrBuff internalBuffer;
-        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
-        internalBuffer.c(schemaSerialized);
-        delete[] schemaSerialized.data;
-
-        Serialized colSerialized = this->columns->serialize_object();
-//        For debugging
-//        ColumnArray test(colSerialized.data, this->schema->column_types->internal_list_);
-        internalBuffer.c(colSerialized);
-        delete[] colSerialized.data;
-        return internalBuffer.getSerialization();
+        Serialized out = {76, "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT"};
+        return out;
     }
 
     bool equals(Object *other) override;
@@ -553,7 +569,8 @@ public:
 void KVStore::put(Key &k, DataFrame *df) {
     if (k.idx_ != idx_) {
         StrBuff buff = StrBuff();
-        buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("PUT").c(DELIMITER).c(k.keyString_.c_str()).c(DELIMITER).c(df->serialize_object());
+        buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("PUT").c(DELIMITER).c(k.keyString_.c_str()).c(
+                DELIMITER).c(df->serialize_object());
         client_->sendMessage(buff.get());
     } else {
         map.insert(std::pair<std::string, DataFrame *>(k.keyString_, df));
@@ -594,7 +611,7 @@ void KVStore::use(char *msg) {
 
 bool DataFrame::equals(Object *other) {
     if (other == nullptr) return false;
-    DataFrame *s = dynamic_cast<DataFrame*>(other);
+    DataFrame *s = dynamic_cast<DataFrame *>(other);
     if (s == nullptr) return false;
     return this->columns->equals(s->columns) &&
            this->schema->equals(s->schema);

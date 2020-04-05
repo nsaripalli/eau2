@@ -19,8 +19,10 @@ test:
 	./bench
 	./personal
 	./app
-    (sleep 5; run-client) &
-    (cd ../src; run-server)
+	sleep 5
+	./run-client
+	cd ../src
+	run-server
 
 valgrind:
 	valgrind ./test

@@ -12,6 +12,7 @@
 #include <cerrno>
 #include <fcntl.h>
 #include <thread>
+#include <csignal>
 #include "intMetaArray.h"
 #include "stringMetaArray.h"
 
@@ -148,9 +149,18 @@ public:
         }
         pad = &pad->c(*prefix->get());
 
+
         String* output = pad->c(data->c_str(), data->size()).get();
         // printf("Out to %d: %s\n", recFD, output->c_str());
-        int out = write(recFD, output->c_str(), output->size());
+        signal(SIGPIPE, SIG_IGN);
+            int out = write(recFD, output->c_str(), output->size());
+
+        if (out == -1) {
+            if (errno == EPIPE) {
+                //it's broken
+                assert(false);
+            }
+        }
 
         delete prefix;
         delete pad;
@@ -363,6 +373,7 @@ public:
       printf("[%s %s] Received: ", name, ip->c_str());
       fwrite(received->c_str(), 1, received->size(), stdout);
       printf("\n");
+      fflush(stdout);
       if (cds->size() > 1) {
         ips->c(","); // token to seperate ips
       }
@@ -510,6 +521,7 @@ public:
       Socket rec = Socket();
       printf("[%s %s] Sending msg to %s: ", name, ip->c_str(), ips->get(i)->c_str());
       fwrite(msg->c_str(), 1, msg->size(), stdout);
+      fflush(stdout);
       printf("\n");
       int recFD = rec.socketConnect(ips->get(i), 8080);
       sock->sendAll(msg, recFD);

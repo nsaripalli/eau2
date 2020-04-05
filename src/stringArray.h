@@ -30,7 +30,7 @@ public:
         memcpy(&size_of_curr_col, input, sizeof(size_t));
         char* token=input + sizeof(size_t);
 
-        while (size_of_curr_col != UINT32_MAX) {
+        while (size_of_curr_col != SIZE_MAX) {
             this->internal_array->append(new String(token));
 
             size_t size_of_next_col = 0;
@@ -161,12 +161,12 @@ public:
             delete [] curr_col.data;
         }
 
-        size_t max = UINT32_MAX;
+        size_t max = SIZE_MAX;
         char schema_size_serailzied[sizeof(size_t)];
         memset(&schema_size_serailzied, 0, sizeof(size_t));
         memcpy(&schema_size_serailzied, &max, sizeof(size_t));
 
-        interalBuffer.c(schema_size_serailzied);
+        interalBuffer.c(schema_size_serailzied, sizeof(size_t));
 
         return interalBuffer.getSerialization();
     }

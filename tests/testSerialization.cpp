@@ -183,7 +183,68 @@ int testColumnArray() {
     return 0;
 }
 
+int testIntDF() {
+    Schema s("I");
+    DataFrame testingDF(s);
+    testingDF.set(0, 0, 0);
+    for (int i = 1; i < 17; i++) {
+        testingDF.set(0, i, i);
+    }
+    testingDF.set(0, 17, 9999);
+
+    Serialized testSerializationDF = testingDF.serialize_object();
+
+    DataFrame deSeralizedDF(testSerializationDF.data);
+
+
+    assert(testingDF.equals(&deSeralizedDF));
+    delete[] testSerializationDF.data;
+    return 0;
+}
+
+
+int testLargeIntZerosDF() {
+    Schema s("I");
+    DataFrame testingDF(s);
+    testingDF.set(0, 0, 0);
+    for (int i = 1; i < 100*1000; i++) {
+        testingDF.set(0, i, 0);
+    }
+
+    Serialized testSerializationDF = testingDF.serialize_object();
+
+    DataFrame deSeralizedDF(testSerializationDF.data);
+
+
+    assert(testingDF.equals(&deSeralizedDF));
+    delete[] testSerializationDF.data;
+    return 0;
+}
+
+int testLargeIntDF() {
+    testLargeIntZerosDF();
+    Schema s("I");
+    DataFrame testingDF(s);
+    testingDF.set(0, 0, 0);
+    for (int i = 1; i < 100*1000; i++) {
+        testingDF.set(0, i, i);
+    }
+    testingDF.set(0, 17, 9999);
+
+    Serialized testSerializationDF = testingDF.serialize_object();
+
+    DataFrame deSeralizedDF(testSerializationDF.data);
+
+
+    assert(testingDF.equals(&deSeralizedDF));
+    delete[] testSerializationDF.data;
+    return 0;
+}
+
+
 int testDF() {
+    testIntDF();
+    testLargeIntDF();
     Schema s("B");
     DataFrame testingDF(s);
     testingDF.set(0, 0, false);

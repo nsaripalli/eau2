@@ -3,6 +3,9 @@
 #include "../src/application.h"
 #include <thread>
 
+//100*1000
+size_t SIZE_OF_DF = 10;
+
 class Demo : public Application {
 public:
   Key main = Key("main",0);
@@ -20,9 +23,10 @@ public:
   }
  
   void producer() {
-    size_t SZ = 100*1000;
-    float* vals = new float[SZ];
-    float sum = 0;
+    size_t SZ = SIZE_OF_DF;
+//    this used to be float
+    int* vals = new int[SZ];
+    int sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
     DataFrame::fromArray(&main, kv, SZ, vals);
     DataFrame::fromScalar(&check, kv, sum);
@@ -30,8 +34,8 @@ public:
  
   void counter() {
     DataFrame* v = kv->wait_and_get(main);
-    size_t sum = 0;
-    for (size_t i = 0; i < 100*1000; ++i) sum += v->get_float(0,i);
+    int sum = 0;
+    for (size_t i = 0; i < SIZE_OF_DF; ++i) sum += v->get_int(0,i);
     p("The sum is  ").pln(sum);
     DataFrame::fromScalar(&verify, kv, sum);
   }

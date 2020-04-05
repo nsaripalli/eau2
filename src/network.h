@@ -360,7 +360,9 @@ public:
    */
   virtual void onReceive_(String* received) {
     if (!received->equals(mt)) {
-      printf("[%s %s] Received: %.100s\n", name, ip->c_str(), received->c_str());
+      printf("[%s %s] Received: ", name, ip->c_str());
+      fwrite(received->c_str(), 1, received->size(), stdout);
+      printf("\n");
       if (cds->size() > 1) {
         ips->c(","); // token to seperate ips
       }

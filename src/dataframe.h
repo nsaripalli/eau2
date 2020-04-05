@@ -24,7 +24,7 @@
 #include <queue>
 //#include "KVStore.h"
 
-
+// Credit to https://stackoverflow.com/a/29789623 for this function
 char *multi_tok(char *input, const char *delimiter) {
     static char *string;
     if (input != NULL)
@@ -85,7 +85,7 @@ public:
     Client *client_;
     std::queue<DataFrame **> dfq; // Keeps track of the pointers to update
 
-    const char* DELIMITER = " Hc廟bRꝽ ";
+    const char* DELIMITER = " Hc廟bRꝽɴ굃d獪|㕚 ";
 
     /**
      * Default constructor, setting the KV store to be on node 0

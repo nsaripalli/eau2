@@ -508,7 +508,9 @@ public:
   void sendMessage(String* msg) {
     for (size_t i=0; i < ips->size(); i++) {
       Socket rec = Socket();
-      printf("[%s %s] Sending msg to %s: %.100s\n", name, ip->c_str(), ips->get(i)->c_str(), msg->c_str());
+      printf("[%s %s] Sending msg to %s: ", name, ip->c_str(), ips->get(i)->c_str());
+      fwrite(msg->c_str(), 1, msg->size(), stdout);
+      printf("\n");
       int recFD = rec.socketConnect(ips->get(i), 8080);
       sock->sendAll(msg, recFD);
     }

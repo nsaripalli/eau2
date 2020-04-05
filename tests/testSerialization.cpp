@@ -306,6 +306,7 @@ int testNullEscaper() {
     Serialized output = StrBuff::convert_back_to_original(converted.data);
     assert(output.size == size);
     assert(memcmp(output.data, data, size * sizeof(char)) == 0);
+    return 0;
 }
 
 int main() {

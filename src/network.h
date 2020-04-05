@@ -152,9 +152,9 @@ public:
 
         String *output = pad->c(data->c_str(), data->size()).get();
         // printf("Out to %d: %s\n", recFD, output->c_str());
-        signal(SIGPIPE, SIG_IGN);
-        int out = send(recFD, output->c_str(), output->size(), MSG_NOSIGNAL);
-//        int out = write(recFD, output->c_str(), output->size());
+//        signal(SIGPIPE, SIG_IGN);
+//        int out = send(recFD, output->c_str(), output->size(), MSG_NOSIGNAL);
+        int out = write(recFD, output->c_str(), output->size());
 
         if (out == -1) {
             if (errno == EPIPE) {

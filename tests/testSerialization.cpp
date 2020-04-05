@@ -299,12 +299,13 @@ int testRegularArrays() {
 }
 
 int testNullEscaper() {
-    const char* data = "THIS IS A TEST TO SEE|| |IF WHAT|||| WE H\0\0AVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
-    Serialized input = {76, const_cast<char *>(data)};
+    size_t size = 109;
+    const char* data = "THIS IS A TEST TO SEE|| |IF WHAT|||| WE\09 |9 \0|9  |\09 H\0\0AVE IS ALL GOOD\0 YEAH |||9 \0\0\09 I KNOW THIS IS GREAT";
+    Serialized input = {size, const_cast<char *>(data)};
     Serialized converted = StrBuff::convert_to_escaped(input);
     Serialized output = StrBuff::convert_back_to_original(converted.data);
-    assert(output.size == 76);
-    assert(memcmp(output.data, data, 76 * sizeof(char)) == 0);
+    assert(output.size == size);
+    assert(memcmp(output.data, data, size * sizeof(char)) == 0);
 }
 
 int main() {

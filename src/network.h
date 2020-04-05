@@ -465,19 +465,22 @@ public:
   virtual void onReceive_(String* received) {
     if (!received->equals(mt)) {
       printf("[Client %s] Received: %s\n", ip->c_str(), received->c_str());
-      char* tok = strtok(received->c_str(), " ");
+      char tok[4];
+      memset(&tok, 0, 4);
+      tok[3] = '\0';
+      strncpy(tok, received->c_str(), 3);
 
       if (strcmp(tok, "IPS") == 0) {
         StringMetaArray* newIps = new StringMetaArray();
-        tok = strtok(nullptr, ",");
+        char* tok2 = strtok(&(received->c_str()[4]), ",");
 
-        while(tok != nullptr) {
-          String* newIp = new String(tok);
+        while(tok2 != nullptr) {
+          String* newIp = new String(tok2);
           if (!newIp->equals(ip)) {
             newIps->push_back(newIp);
-            printf("[Client %s] Adding ip: %s\n", ip->c_str(), tok);
+            printf("[Client %s] Adding ip: %s\n", ip->c_str(), tok2);
           }
-          tok = strtok(nullptr, ",");
+          tok2 = strtok(nullptr, ",");
         }
 
         delete ips;

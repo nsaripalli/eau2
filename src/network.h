@@ -513,6 +513,7 @@ public:
       printf("\n");
       int recFD = rec.socketConnect(ips->get(i), 8080);
       sock->sendAll(msg, recFD);
+      sock->close();
     }
   }
 };

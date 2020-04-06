@@ -179,6 +179,7 @@ public:
         schema = new Schema(tok);
 //        TODO be cleaner.
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
+        delete[] raw.data;
     }
 
     void mutateToNewData(char* input) {
@@ -202,6 +203,8 @@ public:
         schema = new Schema(tok);
 //        TODO be cleaner.
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
+
+        delete[] raw.data;
     }
 
     virtual ~DataFrame() {
@@ -575,6 +578,7 @@ public:
 
 //        Serialized internalBuffer = {76, "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT"};
         Serialized out = StrBuff::convert_to_escaped(tmp);
+        delete[] tmp.data;
         return out;
     }
 
@@ -640,7 +644,11 @@ DataFrame *KVStore::get(Key &key) {
 }
 
 DataFrame *KVStore::wait_and_get(Key &key) {
+//    Give enough time for the network to initialize. So sleep. Yes, need to refactor.
+    sleep(2);
     DataFrame *df = get(key);
+//    TODO refactor. Currently, empty dataframes cannot be transmitted over the network.
+// Perhaps, this is fine for our use case.
     while (df->nrows() == 0);
     return df;
 }

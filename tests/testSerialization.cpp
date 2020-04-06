@@ -293,7 +293,7 @@ int testRegularArrays() {
 
     assert(itesting.equals(&deSeralizedI));
 
-    delete testSerializationI;
+    delete[] testSerializationI;
 
     return 0;
 }

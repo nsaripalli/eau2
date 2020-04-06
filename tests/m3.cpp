@@ -3,8 +3,12 @@
 #include "../src/application.h"
 #include <thread>
 
-//100*1000
-size_t SIZE_OF_DF = 23;
+size_t SIZE_OF_DF = 100*1000;
+
+// To run this make Server on one terminal
+// Then cmake m3.
+// Once you get SUCESS in the terminal hit enter on the Server Program
+// Everything will come to a complete.
 
 class Demo : public Application {
 public:
@@ -32,7 +36,6 @@ public:
   }
  
   void counter() {
-      sleep(2);
     DataFrame* v = kv->wait_and_get(main);
     int sum = 0;
     for (size_t i = 0; i < SIZE_OF_DF; ++i) sum += v->get_int(0,i);
@@ -41,7 +44,10 @@ public:
   }
  
   void summarizer() {
-    sleep(30);
+//      We need to sleep to make sure the other nodes are done computing.
+// Yes, this needs to be refactored, so we can request for unfinished data.
+// Our main goal this time was just to get the networking done.
+    sleep(10);
     DataFrame* result = kv->wait_and_get(verify);
     DataFrame* expected = kv->wait_and_get(check);
     pln(expected->get_int(0,0)==result->get_int(0,0) ? "SUCCESS":"FAILURE");

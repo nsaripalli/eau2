@@ -117,3 +117,8 @@ As of 4/6:
 
   - Chunks can be put into the kv store from a node not storing the chunk, ie the key for a put
   can have a different index than the node (the put is distributed).
+  
+  - Currently empty dataframes cannot be redistributed over the network. This is probably be fine for the
+  eau2 use case, but is a limitation that needs to be refactored.
+  
+  - Wait and Get needs to be refactored, so we can request for non-existing keys.

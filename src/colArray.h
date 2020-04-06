@@ -62,6 +62,11 @@ public:
 
     // destructor
     ~ColumnArray() {
+//        for (size_t i = 0; i < internal_array->array_size; i++) {
+//            if (internal_array->get(i) != nullptr) {
+//                delete internal_array->get(i);
+//            }
+//        }
         delete internal_array;
     }
 

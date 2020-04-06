@@ -108,3 +108,12 @@ As of 3/30:
   - we have a serializable dataframe
 
   - we demo the client's requested functionality
+
+As of 4/6:
+
+  - The distributed kv store correctly seriales and deserializes data frames
+
+  - The kv store has a working wait and get for existing keys
+
+  - Chunks can be put into the kv store from a node not storing the chunk, ie the key for a put
+  can have a different index than the node (the put is distributed).

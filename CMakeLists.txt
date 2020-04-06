@@ -22,5 +22,6 @@ find_package(Threads REQUIRED)
 
 
 add_executable(m3 tests/m3.cpp)
+add_executable(m4 tests/m4.cpp)
 add_executable(server tests/server.cpp)
 add_executable(serialization tests/testSerialization.cpp)

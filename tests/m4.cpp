@@ -3,11 +3,11 @@
 #include "../src/application.h"
 #include <thread>
 
-class FileReader : public Writer {
+class FileReader {
 public:
     /** Reads next word and stores it in the row. Actually read the word.
         While reading the word, we may have to re-fill the buffer  */
-    void visit(Row & r) override {
+    void visit(Row & r)  {
         assert(i_ < end_);
         assert(! isspace(buf_[i_]));
         size_t wStart = i_;
@@ -23,7 +23,7 @@ public:
         }
         buf_[i_] = 0;
         String word(buf_ + wStart, i_ - wStart);
-        r.set(0, word);
+        r.set(0, &word);
         ++i_;
         skipWhitespace_();
     }
@@ -31,12 +31,12 @@ public:
     /** Returns true when there are no more words to read.  There is nothing
        more to read if we are at the end of the buffer and the file has
        all been read.     */
-    bool done() override { return (i_ >= end_) && feof(file_);  }
+    bool done() { return (i_ >= end_) && feof(file_);  }
 
     /** Creates the reader and opens the file for reading.  */
-    FileReader() {
-        file_ = fopen(arg.file, "r");
-        if (file_ == nullptr) FATAL_ERROR("Cannot open file " << arg.file);
+    FileReader(const char* filename) {
+        file_ = fopen(filename, "r");
+        if (file_ == nullptr) std::cerr << "Cannot open file " << filename;
         buf_ = new char[BUFSIZE + 1]; //  null terminator
         fillBuffer_();
         skipWhitespace_();
@@ -81,13 +81,13 @@ public:
 
 
 /****************************************************************************/
-class Adder : public Reader {
+class Adder {
 public:
     SIMap& map_;  // String to Num map;  Num holds an int
 
     Adder(SIMap& map) : map_(map)  {}
 
-    bool visit(Row& r) override {
+    bool visit(Row& r) {
         String* word = r.get_string(0);
         assert(word != nullptr);
         Num* num = map_.contains(*word) ? map_.get(*word) : new Num();
@@ -99,7 +99,7 @@ public:
 };
 
 /***************************************************************************/
-class Summer : public Writer {
+class Summer {
 public:
     SIMap& map_;
     size_t i = 0;
@@ -130,7 +130,7 @@ public:
         if (i == map_.capacity_ || j == map_.items_[i].keys_.size()) {
             assert(false); return 0;
         }
-        return ((Num*)(map_.items_[i].vals_.get_(j)))->v;
+        return map_.items_[i].vals_.get_(j);
     }
 
     void visit(Row& r) {

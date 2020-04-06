@@ -82,9 +82,9 @@ public:
         serv.sin_family = AF_INET;
         serv.sin_port = htons(PORT);
         assert(inet_pton(AF_INET, ip->c_str(), &serv.sin_addr) > 0);
-        connect(recFD,
+        assert(connect(recFD,
                 (struct sockaddr *) &serv,
-                sizeof(serv));
+                sizeof(serv)) >= 0);
         fcntl(recFD, F_SETFL, O_NONBLOCK);
         return recFD;
     }

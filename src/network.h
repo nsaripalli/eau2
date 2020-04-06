@@ -85,7 +85,8 @@ public:
         assert(connect(recFD,
                 (struct sockaddr *) &serv,
                 sizeof(serv)) >= 0);
-        fcntl(recFD, F_SETFL, O_NONBLOCK);
+        int rv = fcntl(recFD, F_SETFL, O_NONBLOCK);
+        assert(rv != -1);
         return recFD;
     }
 
@@ -124,7 +125,8 @@ public:
 
         int size = sizeof(t_ain);
         int newFD = accept(sockFD, (struct sockaddr *) &t_ain, (socklen_t *) &size);
-        fcntl(newFD, F_SETFL, O_NONBLOCK);
+        int rv = fcntl(newFD, F_SETFL, O_NONBLOCK);
+//        assert(rv != -1);
         return newFD;
     }
 

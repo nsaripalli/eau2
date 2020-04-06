@@ -4,7 +4,7 @@
 #include <thread>
 
 //100*1000
-size_t SIZE_OF_DF = 10;
+size_t SIZE_OF_DF = 23;
 
 class Demo : public Application {
 public:
@@ -24,7 +24,6 @@ public:
  
   void producer() {
     size_t SZ = SIZE_OF_DF;
-//    this used to be float
     int* vals = new int[SZ];
     int sum = 0;
     for (size_t i = 0; i < SZ; ++i) sum += vals[i] = i;
@@ -33,6 +32,7 @@ public:
   }
  
   void counter() {
+      sleep(2);
     DataFrame* v = kv->wait_and_get(main);
     int sum = 0;
     for (size_t i = 0; i < SIZE_OF_DF; ++i) sum += v->get_int(0,i);
@@ -41,10 +41,10 @@ public:
   }
  
   void summarizer() {
-    sleep(10);
+    sleep(30);
     DataFrame* result = kv->wait_and_get(verify);
     DataFrame* expected = kv->wait_and_get(check);
-    pln(expected->get_float(0,0)==result->get_float(0,0) ? "SUCCESS":"FAILURE");
+    pln(expected->get_int(0,0)==result->get_int(0,0) ? "SUCCESS":"FAILURE");
   }
 };
 

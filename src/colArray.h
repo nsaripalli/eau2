@@ -16,8 +16,7 @@ class ColumnArray : public SerializableObject {
 public:
 
     Array* internal_array;
-//    const char* SERIALIZATION_DELIMETER = "\uECCF6e缽ȝ`ſǀƈ嘟ͥ\u1941";
-    const char* SERIALIZATION_DELIMETER = "////";
+
 
 
 

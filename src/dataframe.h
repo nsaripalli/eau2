@@ -83,7 +83,7 @@ public:
     int idx_;
     std::map<std::string, DataFrame *> map;
     Client *client_;
-    std::queue<DataFrame **> dfq; // Keeps track of the pointers to update
+    std::queue<DataFrame *> dfq; // Keeps track of the pointers to update
 
     const char *DELIMITER = "Hc廟bRꝽɴ굃d獪|㕚";
 
@@ -130,30 +130,14 @@ public:
      * Returns a pointer initially null that will be
      * updated to the value when complete.
      */
-    DataFrame *get(Key &key) {
-        if (key.idx_ != idx_) {
-            DataFrame *df = nullptr;
-            dfq.push(&df);
-            StrBuff buff = StrBuff();
-            buff.c("MSG ").c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
-                    key.keyString_.c_str());
-            client_->sendMessage(buff.get());
-            return df;
-        } else {
-            return map.at(key.keyString_);
-        }
-    }
+    DataFrame *get(Key &key);
 
     /**
      * Returns the value associated with the key,
      * blocking if it needs to request the value
      * to another KV Store (node)
      */
-    DataFrame *wait_and_get(Key &key) {
-        DataFrame *df = get(key);
-        while (!df);
-        return df;
-    }
+    DataFrame *wait_and_get(Key &key);
 
     /**
      * Puts the given dataframe into the KV store associated
@@ -165,6 +149,7 @@ public:
 
 /****************************************************************************
  * DataFrame::
+ *
  *
  * A DataFrame is table composed of columns of equal length. Each column
  * holds values of the same type (I, S, B, F). A DataFrame has a schema that
@@ -182,6 +167,29 @@ public:
     DataFrame(char *input) {
         Serialized raw = StrBuff::convert_back_to_original(input);
         puts("IN SERIALIATION");
+        fflush(stdout);
+        char* serialized = raw.data;
+        printf("%zu\n", raw.size);
+
+        const char* dup = "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
+        size_t size_of_schema = 0;
+        memcpy(&size_of_schema, serialized, sizeof(size_t));
+        char *tok = serialized + sizeof(size_t);
+
+        schema = new Schema(tok);
+//        TODO be cleaner.
+        columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
+    }
+
+    void mutateToNewData(char* input) {
+        for (int i = 0; i < this->columns->length(); i++) {
+            delete this->columns->get(i);
+        }
+        delete columns;
+        delete schema;
+
+        Serialized raw = StrBuff::convert_back_to_original(input);
+        puts("IN MUTATION OF SERIALIZATION");
         fflush(stdout);
         char* serialized = raw.data;
         printf("%zu\n", raw.size);
@@ -609,11 +617,32 @@ void KVStore::use(char *msg) {
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, DELIMITER);
         printf("HERE THO\n");
-        *(dfq.front()) = new DataFrame(tok);
+        dfq.front()->mutateToNewData(tok);
         dfq.pop();
     }
 
 
+}
+
+DataFrame *KVStore::get(Key &key) {
+    if (key.idx_ != idx_) {
+        Schema s("");
+        DataFrame *df = new DataFrame(s);
+        dfq.push(df);
+        StrBuff buff = StrBuff();
+        buff.c("MSG ").c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
+                key.keyString_.c_str());
+        client_->sendMessage(buff.get());
+        return df;
+    } else {
+        return map.at(key.keyString_);
+    }
+}
+
+DataFrame *KVStore::wait_and_get(Key &key) {
+    DataFrame *df = get(key);
+    while (df->nrows() == 0);
+    return df;
 }
 
 bool DataFrame::equals(Object *other) {

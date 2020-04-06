@@ -2,9 +2,8 @@
 #include "../src/network.h"
 #include "../src/application.h"
 #include <thread>
+#include <bits/stdc++.h>
 
-//size_t SIZE_OF_DF = 100*1000;
-size_t SIZE_OF_DF = 100;
 
 struct cmp_str
 {
@@ -34,7 +33,31 @@ public:
     }
 
     void reader() {
-//        TODO output a new df of words here.
+//        https://www.geeksforgeeks.org/cpp-program-read-file-word-word/
+// Will read word by word and output a dataframe that is one column all all words.
+
+        // filestream variable file
+        std::fstream file;
+        std::string word, t, q, filename;
+
+        // filename of the file
+        filename = "file.txt";
+
+        // opening file
+        file.open(filename.c_str());
+
+        Schema s("S");
+        DataFrame* out = new DataFrame(s);
+        // extracting words from the file
+        size_t curr_idx = 0;
+        while (file >> word)
+        {
+            String* curr = new String(word.data());
+            out->set(0, curr_idx, curr);
+            curr_idx++;
+        }
+
+        kv->put(main, out);
     }
 
     void counter1() {
@@ -53,6 +76,7 @@ public:
         {
             out->set(0, curr_idx, p.first);
             out->set(0, curr_idx, p.second);
+            curr_idx++;
         }
 
         kv->put(c1, out);
@@ -74,6 +98,7 @@ public:
         {
             out->set(0, curr_idx, p.first);
             out->set(0, curr_idx, p.second);
+            curr_idx++;
         }
 
         kv->put(c2, out);
@@ -95,6 +120,7 @@ public:
         {
             out->set(0, curr_idx, p.first);
             out->set(0, curr_idx, p.second);
+            curr_idx++;
         }
 
         kv->put(c3, out);

@@ -122,3 +122,10 @@ As of 4/6:
   eau2 use case, but is a limitation that needs to be refactored.
   
   - Wait and Get needs to be refactored, so we can request for non-existing keys.
+
+  - We have *two* viable demonstrations of a WordCount program (m4 and WordCount) in the 
+  last stages of development. This is meant to show how to use our eau2 system in order
+  to meet the customer requests. The program is fully distributed. The former demo
+  is meant to closely parrallel the customer application draft; the ladder is meant
+  to show an alternative straightforward way to implement similar functionality with
+  our design / architecture in mind. 

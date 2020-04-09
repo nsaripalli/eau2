@@ -62,8 +62,6 @@ public:
         return *this->schema;
     }
 
-public:
-
     DataFrame *getDataFrameWithRow(size_t row) {
         Key *key = getKeyForRow(row);
         DataFrame *df = kv.get(*key);

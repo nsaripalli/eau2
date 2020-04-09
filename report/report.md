@@ -112,6 +112,7 @@ As of 3/30:
 As of 4/6:
 
   - The distributed kv store correctly seriales and deserializes data frames
+  
 
   - The kv store has a working wait and get for existing keys
 

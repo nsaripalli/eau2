@@ -132,6 +132,7 @@ As of 4/6:
 
 4/9 TODO:
 
+ - Follow up with JAN for grade grubbing
  - Integrate SORER
  - Chunk the data into smaller dataframes
     - Distribute it
@@ -143,3 +144,4 @@ As of 4/6:
  - Make keys not have idx  
  - code review tech debt
  - refactoring file structures 
+    - delete extra files

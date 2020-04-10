@@ -116,8 +116,8 @@ public:
     }
 
     ~KVStore() {
-        client_->shutdown();
-        delete client_;
+            client_->shutdown();
+            delete client_;
     }
 
     /**
@@ -132,7 +132,7 @@ public:
      */
     void use(char *msg);
 
-    /**
+    virtual /**
      * Returns the value associated with the key,
      * NOT blocking if it needs to request the value
      * to another KV Store (node).
@@ -148,7 +148,7 @@ public:
      */
     DataFrame *wait_and_get(Key &key);
 
-    /**
+    virtual /**
      * Puts the given dataframe into the KV store associated
      * with the given key, associating the value with the given
      * key. non-blocking.

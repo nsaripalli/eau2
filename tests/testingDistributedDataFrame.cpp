@@ -1,6 +1,19 @@
 #pragma once
-#include "dataframe.h"
+#include "../src/dataframe.h"
 #include <set>
+
+class DummyKVStore {
+public:
+    std::map<std::string, DataFrame *> map;
+
+    DataFrame *get(Key &key) {
+        return map[key.keyString_];
+    }
+
+    void put(Key &k, DataFrame *df) {
+        map[k.keyString_] =df;
+    }
+};
 
 size_t numRowsOfEachMetaDF = 1000;
 
@@ -8,13 +21,13 @@ class DistributedDataFrame : SerializableObject {
 public:
     size_t numOfNodes;
     Schema *schema;
-    KVStore kv;
+    DummyKVStore kv;
     String *uniqueID;
     std::set <int> createdSubDFs;
 
     size_t maxIdx;
 
-    DistributedDataFrame(Schema &schema, size_t numOfNodes, KVStore kvStore, String *unique_ID) {
+    DistributedDataFrame(Schema &schema, size_t numOfNodes, DummyKVStore kvStore, String *unique_ID) {
         this->schema = new Schema(schema);
         this->numOfNodes = numOfNodes;
         this->kv = kvStore;

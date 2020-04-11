@@ -4,7 +4,7 @@
 
 size_t numRowsOfEachMetaDF = 1000;
 
-class DistributedDataFrame : SerializableObject {
+class DistributedDataFrame : public DataFrame {
 public:
     size_t numOfNodes;
     Schema *schema;

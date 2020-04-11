@@ -7,6 +7,7 @@
 #include "type.h"
 #include "dataframe.h"
 #include "util.h"
+#include "distributedDataFrame.h"
 
 using namespace std;
 
@@ -233,6 +234,23 @@ class SorAdapter {
             string file = string(filename);
             Schema* schema = infer_schema(file, from, length);
             df_ = new DataFrame(*schema);
+            build_DataFrame(file, from, length);
+        }
+
+        /**
+         * Constructor for SorAdapter class that adapts to a DistributedDataFrame
+         */
+        SorAdapter(
+            unsigned int from,
+            unsigned int length,
+            char* filename,
+            int numNodes,
+            KVStore kv,
+            String *uid
+        ) {
+            string file = string(filename);
+            Schema* schema = infer_schema(file, from, length);
+            df_ = new DistributedDataFrame(*schema, numNodes, kv, uid);
             build_DataFrame(file, from, length);
         }
 

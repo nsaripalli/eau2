@@ -227,6 +227,15 @@ public:
     /** Create a data frame from a schema and columns. All columns are created
       * empty. */
     DataFrame(Schema &schema) {
+        init(schema);
+    }
+
+    DataFrame() {
+        Schema s = Schema();
+        init(s);
+    }
+
+    void init(Schema &schema) {
         this->schema = new Schema(schema);
         this->columns = new ColumnArray();
 
@@ -246,7 +255,6 @@ public:
                 this->columns->append(new FloatColumn());
             }
         }
-
     }
 
     virtual /** Returns the DataFrame's schema-> Modifying the schema after a DataFrame

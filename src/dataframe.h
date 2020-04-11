@@ -100,11 +100,7 @@ public:
      * Default constructor, setting the KV store to be on node 0
      * with ip and port 127.0.0.2:8080
      */
-    KVStore() {
-        idx_ = 0;
-        client_ = new Client("127.0.0.2", 8080, this);
-        client_->bgStart();
-    }
+    KVStore() : KVStore(0, "127.0.0.2", 8080) {}
 
     /**
      * Creates a KV store associated with node `idx`
@@ -113,6 +109,7 @@ public:
         idx_ = idx;
         client_ = new Client(ip, port, this);
         client_->bgStart();
+        sleep(2); // Let everything register
     }
 
     ~KVStore() {
@@ -668,8 +665,6 @@ DataFrame *KVStore::get(Key &key) {
 }
 
 DataFrame *KVStore::wait_and_get(Key &key) {
-//    Give enough time for the network to initialize. So sleep. Yes, need to refactor.
-    sleep(2);
     DataFrame *df = get(key);
 //    TODO refactor. Currently, empty dataframes cannot be transmitted over the network.
 // Perhaps, this is fine for our use case.

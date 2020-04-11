@@ -231,12 +231,12 @@ public:
     }
 
     DataFrame() {
-        Schema s = Schema();
+        Schema s;
         init(s);
     }
 
-    void init(Schema &schema) {
-        this->schema = new Schema(schema);
+    void init(Schema &s) {
+        this->schema = new Schema(s);
         this->columns = new ColumnArray();
 
 //        Iterate through each of the elements in the row and give them to Fielder

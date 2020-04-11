@@ -23,6 +23,7 @@ find_package(Threads REQUIRED)
 
 add_executable(serialization tests/testSerialization.cpp)
 add_executable(test_ddf tests/distributedDataFrameTests.cpp)
+add_executable(wordCount tests/WordCount.cpp)
 add_executable(server tests/server.cpp)
 add_executable(m3 tests/m3.cpp)
 add_executable(m4 tests/WordCount.cpp)

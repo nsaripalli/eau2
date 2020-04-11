@@ -604,6 +604,8 @@ public:
         return out;
     }
 
+    static DataFrame *fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes);
+
     bool equals(Object *other) override;
 };
 

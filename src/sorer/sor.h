@@ -243,7 +243,7 @@ class SorAdapter {
         SorAdapter(
             unsigned int from,
             unsigned int length,
-            char* filename,
+            const char* filename,
             int numNodes,
             KVStore kv,
             String *uid
@@ -316,3 +316,11 @@ class SorAdapter {
             delete df_;
         }
 };
+
+DataFrame* DataFrame::fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes) {
+    String* uid = new String(key.keyString_.c_str());
+    SorAdapter sa = SorAdapter(0, 5000, fileName, numNodes, kv, uid);
+    DataFrame* df = sa.get_df();
+    kv.put(key, df);
+    return df;
+}

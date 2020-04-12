@@ -118,11 +118,12 @@ public:
     }
 
     /**
-     * Parses out and deals with the three networking functionalities
+     * Parses out and deals with the four networking functionalities
      * of a KV Store:
      * 1. Adding a dataframe to the kv store
      * 2. Returning a dataframe from the store
      * 3. Accepting a returned dataframe from another store
+     * 4. The key requested was bad (does not yet exist) and should be retried
      *
      * All msgs match the following structure:
      * "[from idx][delimiter][to idx][delimiter][verb][delimiter][specifics... (relavant key, value info)]"
@@ -152,6 +153,9 @@ public:
      */
     void put(Key &k, DataFrame *df);
 
+    /**
+     * 
+     */
     virtual void getAgain(Key &k);
 };
 
@@ -175,12 +179,9 @@ public:
 
     DataFrame(char *input) {
         Serialized raw = StrBuff::convert_back_to_original(input);
-        puts("IN SERIALIATION");
         fflush(stdout);
         char* serialized = raw.data;
-        printf("%zu\n", raw.size);
 
-        const char* dup = "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
         char *tok = serialized + sizeof(size_t);
@@ -650,13 +651,12 @@ void KVStore::use(char *msg) {
         }
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, DELIMITER);
-        printf("HERE THO\n");
         dfq.front()->mutateToNewData(tok);
         dfq.pop();
     } else if (strcmp(tok, "BAD") == 0) { // key string
         tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, from);
-        std::thread t(&KVStore::getAgain, this, k);
+        std::thread t = std::thread(&KVStore::getAgain, this, k);
         t.detach();
     } 
 }

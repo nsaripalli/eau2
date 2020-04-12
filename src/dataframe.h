@@ -166,6 +166,7 @@ public:
 
     ColumnArray *columns;
     Schema *schema; //owned
+    bool hasBeenMutated = false;
 
     /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
@@ -211,6 +212,8 @@ public:
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
 
         delete[] raw.data;
+
+        this->hasBeenMutated = true;
     }
 
     virtual ~DataFrame() {
@@ -645,8 +648,6 @@ void KVStore::use(char *msg) {
         dfq.front()->mutateToNewData(tok);
         dfq.pop();
     }
-
-
 }
 
 DataFrame *KVStore::get(Key &key) {
@@ -666,9 +667,8 @@ DataFrame *KVStore::get(Key &key) {
 
 DataFrame *KVStore::wait_and_get(Key &key) {
     DataFrame *df = get(key);
-//    TODO refactor. Currently, empty dataframes cannot be transmitted over the network.
-// Perhaps, this is fine for our use case.
-    while (df->nrows() == 0);
+//  Bool to indicate if the df has been modified.
+    while (!df->hasBeenMutated);
     return df;
 }
 

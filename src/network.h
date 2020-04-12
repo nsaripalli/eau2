@@ -480,7 +480,7 @@ public:
      */
     virtual void onReceive_(String *received) {
         if (!received->equals(mt)) {
-            printf("[Client %s] Received: %s\n", ip->c_str(), received->c_str());
+//            printf("[Client %s] Received: %s\n", ip->c_str(), received->c_str());
             char tok[4];
             memset(&tok, 0, 4);
             tok[3] = '\0';

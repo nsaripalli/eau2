@@ -168,6 +168,7 @@ public:
 
     ColumnArray *columns;
     Schema *schema; //owned
+    bool hasBeenMutated = false;
 
     /** Create a data frame with the same columns as the given df but with no rows or rownmaes */
     DataFrame(DataFrame &df) : DataFrame(*df.schema) {}
@@ -213,6 +214,8 @@ public:
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
 
         delete[] raw.data;
+
+        this->hasBeenMutated = true;
     }
 
     virtual ~DataFrame() {
@@ -639,8 +642,12 @@ void KVStore::use(char *msg) {
         tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, to);
         StrBuff buff = StrBuff();
-        buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("RES").c(DELIMITER).c(get(k)->serialize_object());
-        client_->sendMessage(buff.get());
+        if ( map.find(tok) == map.end() ) {
+            buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("BAD").c(DELIMITER).c(tok);
+        } else {
+            buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("RES").c(DELIMITER).c(get(k)->serialize_object());
+            client_->sendMessage(buff.get());
+        }
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, DELIMITER);
         printf("HERE THO\n");
@@ -649,22 +656,20 @@ void KVStore::use(char *msg) {
     } else if (strcmp(tok, "BAD") == 0) { // key string
         tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, from);
-        // TODO try again
+        std::thread t(&KVStore::getAgain, this, k);
+        t.detach();
     } 
-
-
 }
 
 void KVStore::getAgain(Key &k) {
     sleep(2);
-    Schema s("");
-        DataFrame *df = dfq.front();
-        dfq.pop();
-        dfq.push(df);
-        StrBuff buff = StrBuff();
-        buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
-                k.keyString_.c_str());
-        client_->sendMessage(buff.get());
+    DataFrame *df = dfq.front();
+    dfq.pop();
+    dfq.push(df);
+    StrBuff buff = StrBuff();
+    buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
+            k.keyString_.c_str());
+    client_->sendMessage(buff.get());
 }
 
 DataFrame *KVStore::get(Key &key) {
@@ -684,9 +689,8 @@ DataFrame *KVStore::get(Key &key) {
 
 DataFrame *KVStore::wait_and_get(Key &key) {
     DataFrame *df = get(key);
-//    TODO refactor. Currently, empty dataframes cannot be transmitted over the network.
-// Perhaps, this is fine for our use case.
-    while (df->nrows() == 0);
+//  Bool to indicate if the df has been modified.
+    while (!df->hasBeenMutated);
     return df;
 }
 

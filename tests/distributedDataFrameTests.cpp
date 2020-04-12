@@ -25,7 +25,7 @@ int testSimple() {
 
     DummyKVStore* dkv = new DummyKVStore();
     DistributedDataFrame df(s, 3, *dkv, new String("Testing"));
-    for(size_t i = 0; i <  5000; i++) {
+    for(size_t i = 0; i <  10000; i++) {
         df.set(0,i,(int)i);
         df.set(1,i,(bool)true);
         df.set(2,i,(int)i+1);
@@ -34,7 +34,7 @@ int testSimple() {
 
 
     DataFrame normalDF(s);
-    for(size_t i = 0; i <  5000; i++) {
+    for(size_t i = 0; i <  10000; i++) {
         normalDF.set(0, i, (int)i);
         normalDF.set(1, i, (bool)true);
         normalDF.set(2, i, (int)i + 1);
@@ -44,9 +44,12 @@ int testSimple() {
     assert(df.get_int(0, 1) == 1);
     assert(df.get_bool(1, 1345));
     assert(!df.get_bool(3, 4011));
+    assert(df.get_bool(1, 6002));
+    assert(!df.get_bool(3, 6002));
 
     assert(df.nrows() == normalDF.nrows());
     assert(df.ncols() == normalDF.ncols());
+    return 0;
 }
 
 int main() {

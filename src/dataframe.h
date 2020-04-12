@@ -151,6 +151,8 @@ public:
      * key. non-blocking.
      */
     void put(Key &k, DataFrame *df);
+
+    virtual void getAgain(Key &k);
 };
 
 /****************************************************************************
@@ -644,9 +646,25 @@ void KVStore::use(char *msg) {
         printf("HERE THO\n");
         dfq.front()->mutateToNewData(tok);
         dfq.pop();
-    }
+    } else if (strcmp(tok, "BAD") == 0) { // key string
+        tok = multi_tok(nullptr, DELIMITER);
+        Key k = Key(tok, from);
+        // TODO try again
+    } 
 
 
+}
+
+void KVStore::getAgain(Key &k) {
+    sleep(2);
+    Schema s("");
+        DataFrame *df = dfq.front();
+        dfq.pop();
+        dfq.push(df);
+        StrBuff buff = StrBuff();
+        buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
+                k.keyString_.c_str());
+        client_->sendMessage(buff.get());
 }
 
 DataFrame *KVStore::get(Key &key) {

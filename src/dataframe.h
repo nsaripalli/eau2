@@ -167,7 +167,9 @@ public:
     void put(Key &k, DataFrame *df);
 
     /**
-     * 
+     * Helper for retrying gets if the key/data pair does 
+     * not yet exist at they keys node. Sleeps for a couple
+     * seconds, then tries to get (again)
      */
     virtual void getAgain(Key k);
 };
@@ -596,6 +598,11 @@ public:
         return df;
     }
 
+    /**
+     * Using the sorer from teamrp, read/parse the given sor file and convert into a dataframe.
+     * This dataframe will be a distributed data frame.
+     * This dataframe will be added to the kvstore with the given key
+     */
     static DataFrame* fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes);
 
     // Creates a new dataframe with one row matching the schema and who has been accepted by the writer

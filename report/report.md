@@ -133,8 +133,20 @@ As of 4/6:
 
 As of 4/13 
 
+  - we have a distributed dataframe that distributes in equal chunks (by row) across the nodes.
+
   - Our linus demo matches our api / the customers wishes
 
   - Linus compiles
 
-  
+  - We integrated Sorer (with dataframes and distributed dataframes) from TeamRP
+
+  - Linus has currently been tested with 1 degree of seperation on 1 node due to 
+  time and hardware concerns. We expect it to fully scale up in terms of functionality
+  as the networking code and dataframes / other datastructures have been thouroughly
+  tested and verified.
+
+  - NOTE: to run, first compile the server and whichever client-based appplication
+  you want to run (like linus). Then, run the server with "-ip 127.0.0.1".
+  Next, run the client you chose (in a seperate shell/terminal). When the client
+  has completed, press enter on the server session to initiate graceful shutdown.

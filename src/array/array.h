@@ -1,78 +1,60 @@
 //lang::CwC
 #pragma once
 
-#include "object.h"
+#include "../primatives/object.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <cstring>
-#include "errors.h"
+#include "../primatives/errors.h"
 
-/* This class represents an char array.
+/* This class represents an array.
 *  It contains basic methods on array based on the Java arraylist implementation.
 *  There are methods to add, remove, and get elements from the list
 *
 *  author: shah.ash@husky.neu.edu | peters.ci@husky.neu.edu
 *  Implementation authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
 */
-class CharArray : public Object {
+class Array : public Object {
 public:
 
     size_t current_max_index;
     size_t array_size;
-    char *internal_list_;
+    Object **internal_list_;
 
-    CharArray() {
+    Array() {
         array_size = 10;
-        internal_list_ = new char[array_size];
-        memset(internal_list_, 0, array_size * sizeof(char));
+        internal_list_ = new Object *[array_size];
+        memset(internal_list_, 0, array_size * sizeof(Object *));
         this->current_max_index = 0;
     }
 
-    CharArray(CharArray *old) {
-        array_size = old->array_size;
-        internal_list_ = new char[array_size];
-        memcpy(internal_list_, old->internal_list_, array_size * sizeof(char));
-        this->current_max_index = old->current_max_index;
-    }
-
-    CharArray(char* buff) {
-        current_max_index = 0;
-        array_size = 0;
-
-        char *fullInput = buff;
-
-        const char s[2] = "\0";
-        char *token;
-
-        memcpy(&current_max_index, fullInput, sizeof(current_max_index));
-
-        memcpy(&array_size, fullInput + sizeof(current_max_index), sizeof(array_size));
-
-        internal_list_ = new char[array_size];
-
-        char *outsideInternals = fullInput + sizeof(current_max_index) + sizeof(array_size);
-        memcpy(internal_list_, outsideInternals, array_size * sizeof(char));
-    }
-
-    virtual ~CharArray() {
+    virtual ~Array() {
         delete[] internal_list_;
+    }
+
+    Array(Array* old) {
+        array_size = old->array_size;
+        internal_list_ = new Object *[array_size];
+        memcpy(internal_list_, old->internal_list_, array_size * sizeof(Object *));
+        this->current_max_index = old->current_max_index;
     }
 
     // If the array is too small, doubles the array size
     void double_array_size() {
-        char *new_list = new char[array_size * 2];
-        memset(new_list, 0, array_size * 2 * sizeof(char));
-        memcpy(new_list, internal_list_, array_size * sizeof(char));
+        Object **new_list = new Object *[array_size * 2];
+        memset(new_list, 0, array_size * 2 * sizeof(Object *));
+        memcpy(new_list, internal_list_, array_size * sizeof(Object *));
         array_size *= 2;
         delete[] internal_list_;
         internal_list_ = new_list;
     }
 
     /* adds an element to the list at the given index
+    * shifts the element currently at that position to the right
     * @arg o: object to be added to this array
-    * @arg index: the index to add the object at 
+    * @arg index: the index to add the object at
     */
-    void add(char o, size_t index) {
+    void add(Object* o, size_t index) {
         if (index < 0) {
             indexOutOfBounds(index, this->length());
         }
@@ -90,8 +72,8 @@ public:
 
 //        Shift over the array by one at index i
         memcpy(&this->internal_list_[index + 1], &this->internal_list_[index],
-               (this->current_max_index - index) * sizeof(char));
-        memset(&this->internal_list_[index], 0, 1 * sizeof(char));
+               (this->current_max_index - index) * sizeof(Object *));
+        memset(&this->internal_list_[index], 0, 1 * sizeof(Object *));
         this->current_max_index++;
 
         internal_list_[index] = o;
@@ -100,7 +82,7 @@ public:
     /* adds an element to the end of the list
     * @arg o: object to be added to this array
     */
-    void append(char o) {
+    void append(Object* o) {
         if (this->current_max_index >= array_size) {
             double_array_size();
         }
@@ -114,7 +96,7 @@ public:
     * @arg a: the array of elements to be added to this list
     * @arg index: the index at which to add the elements of the given array
     */
-    void add_all(Array *a, size_t index) {
+    void add_all(Array* a, size_t index) {
         if (index < 0) {
             indexOutOfBounds(index, this->length());
         }
@@ -124,9 +106,9 @@ public:
         }
 //        Shift over the current list at i by c size
         memcpy(&this->internal_list_[index + a->length()], &this->internal_list_[index],
-               (this->current_max_index - index) * sizeof(char));
-        memset(&this->internal_list_[index], 0, a->length() * sizeof(char));
-        memcpy(&this->internal_list_[index], &a->internal_list_[0], a->length() * sizeof(char));
+               (this->current_max_index - index) * sizeof(Object *));
+        memset(&this->internal_list_[index], 0, a->length() * sizeof(Object *));
+        memcpy(&this->internal_list_[index], &a->internal_list_[0], a->length() * sizeof(Object *));
 
         this->current_max_index += a->length();
     }
@@ -136,7 +118,9 @@ public:
     */
     void clear() {
         for (size_t i = 0; i < this->current_max_index; i++) {
-            internal_list_[i] = false;
+            if (internal_list_[i] != nullptr) {
+                internal_list_[i] = nullptr;
+            }
         }
         this->current_max_index = 0;
     }
@@ -144,25 +128,25 @@ public:
     /* gets the element in this array at the given index
     * @arg index: the index to get the object at
     */
-    char get(size_t index) {
+    Object* get(size_t index) {
         if (index < 0) {
             indexOutOfBounds(index, this->length());
         }
 
         if (index >= this->current_max_index) {
-            indexOutOfBounds(index, this->length());
+            return nullptr;
         }
 
         return internal_list_[index];
     }
 
-    /* gets the index of the given char, returning the index of the first match.
+    /* gets the index of the given object, returning the index of the first match.
     * returns the size + 1 of the Array if the object cannot be found
     * @arg o: object to get the index of
     */
-    size_t index_of(char o) {
+    size_t index_of(Object* o) {
         for (size_t i = 0; i < this->current_max_index; i++) {
-            if (internal_list_[i] == (o)) {
+            if (internal_list_[i]->equals(o)) {
                 return i;
             }
         }
@@ -173,22 +157,22 @@ public:
     /* removes an element at the given index and returns it
     * @arg index: the index at which to remove the object
     */
-    char remove(size_t index) {
+    Object* remove(size_t index) {
         if (index < 0) {
             indexOutOfBounds(index, this->length());
         }
 
         if (index >= this->current_max_index) {
-            indexOutOfBounds(index, this->length());
+            return nullptr;
         }
 
-        char output = internal_list_[index];
+        Object *output = internal_list_[index];
 
         this->current_max_index--;
 
         //        Shift over the array by one down at index i
         memmove(&this->internal_list_[index], &this->internal_list_[index + 1],
-                (this->current_max_index - index) * sizeof(char));
+                (this->current_max_index - index) * sizeof(Object *));
 
         return output;
     }
@@ -197,7 +181,7 @@ public:
     * @arg index: index at which to swap the element
     * @arg o: the object to swap
     */
-    char set(size_t index, char o) {
+    Object* set(size_t index, Object* o) {
         if (index < 0) {
             indexOutOfBounds(index, this->length());
         }
@@ -206,7 +190,7 @@ public:
             double_array_size();
         }
 
-        char output = this->remove(index);
+        Object *output = this->remove(index);
         this->add(o, index);
         return output;
     }
@@ -217,7 +201,7 @@ public:
      */
     virtual bool equals(Object *other) {
         if (other == nullptr) return false;
-        CharArray *s = dynamic_cast<CharArray *>(other);
+        Array *s = dynamic_cast<Array*>(other);
         if (s == nullptr) return false;
 
         if (s->length() != this->length()) {
@@ -226,7 +210,13 @@ public:
 
         int other_index = 0;
         for (size_t i = 0; i < this->current_max_index; i++) {
-            if (internal_list_[i] != s->get(i)) {
+            if (internal_list_[i] != nullptr && s->get(i) != nullptr) {
+                if (not internal_list_[i]->equals(s->get(i))) {
+                    return false;
+                }
+            }
+//            This means both are not nullptrs even though one of them is.
+            else if (internal_list_[i] != s->get(i)) {
                 return false;
             }
             other_index++;
@@ -241,26 +231,16 @@ public:
         return this->current_max_index;
     }
 
-    size_t hash() {
-        return this->current_max_index;
+    size_t hash_me() {
+        size_t total_hash = 19;
+        int prime = 5;
+        for (size_t i = 0; i < this->current_max_index; i++) {
+            if (internal_list_[i] != nullptr) {
+                total_hash = (total_hash*prime) + internal_list_[i]->hash();
+            }
+        }
+        return total_hash;
+
     }  // Returns the hash code value for this list.
 
-
-    Serialized serialize_object() {
-        size_t serialization_output_length = sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(char));
-        char *totalBytesArray = new char[serialization_output_length];
-        char *bytesCurrent_max_index = totalBytesArray;
-        char *bytesArray_size = totalBytesArray + sizeof(current_max_index);
-        char *internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
-
-        memcpy(bytesCurrent_max_index, &current_max_index, sizeof(current_max_index));
-
-        memcpy(bytesArray_size, &array_size, sizeof(array_size));
-
-        memcpy(internalListSerialization, internal_list_, array_size * sizeof(char));
-
-
-        Serialized out = {serialization_output_length, totalBytesArray};
-        return out;
-    }
 };

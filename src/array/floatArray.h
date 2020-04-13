@@ -1,11 +1,11 @@
 //lang::CwC
 #pragma once
 
-#include "object.h"
+#include "../primatives/object.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <cstring>
-#include "errors.h"
+#include "../primatives/errors.h"
 
 /* This class represents an float array.
 *  It contains basic methods on array based on the Java arraylist implementation.

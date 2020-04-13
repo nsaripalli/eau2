@@ -1,12 +1,12 @@
 //lang::CwC
 #pragma once
 
-#include "object.h"
+#include "../primatives/object.h"
 #include <stdlib.h>
 #include <assert.h>
 #include <cstring>
-#include "errors.h"
-#include "serializableObject.h"
+#include "../primatives/errors.h"
+#include "../primatives/serializableObject.h"
 #include "array.h"
 
 /* This class represents an bool array.

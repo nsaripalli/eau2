@@ -4,10 +4,10 @@
 
 #include <cstddef>
 #include <algorithm>
-#include "../src/intColumn.h"
-#include "../src/floatColumn.h"
-#include "../src/boolColumn.h"
-#include "../src/stringColumn.h"
+#include "../src/columns/intColumn.h"
+#include "../src/columns/floatColumn.h"
+#include "../src/columns/boolColumn.h"
+#include "../src/columns/stringColumn.h"
 #include "../src/dataframe.h"
 
 int num_columns;

@@ -3,7 +3,8 @@
 
 #include <stdlib.h>
 #include "array.h"
-#include "column.h"
+#include "../primatives/string.h"
+#include "../primatives/serializableObject.h"
 
 /* This class represents an array.
 *  It contains basic methods on array based on the Java arraylist implementation.
@@ -12,36 +13,17 @@
 *  author: shah.ash@husky.neu.edu | peters.ci@husky.neu.edu
 *  Implementation authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
 */
-class ColumnArray : public SerializableObject {
+class StringArray : public SerializableObject {
 public:
 
-    Array* internal_array;
-
-
-
+    Array *internal_array;
 
     // default constructor
-    ColumnArray() {
+    StringArray() {
         internal_array = new Array();
     }
 
-    void handleNestedArrayGeneration(char* token, char schema_type) {
-        if ('S' == schema_type) {
-            this->internal_array->append(new StringColumn(token));
-        }
-        if ('B' == schema_type) {
-            this->internal_array->append(new BoolColumn(token));
-        }
-        if ('I' == schema_type) {
-            this->internal_array->append(new IntColumn(token));
-        }
-        if ('F' == schema_type) {
-            this->internal_array->append(new FloatColumn(token));
-        }
-    }
-
-
-    ColumnArray(char* input, char* schema) : ColumnArray() {
+    StringArray(char *input) : StringArray() {
         int curr_col_idx = 0;
 
         size_t size_of_curr_col = 0;
@@ -49,7 +31,7 @@ public:
         char* token=input + sizeof(size_t);
 
         while (size_of_curr_col != SIZE_MAX) {
-            handleNestedArrayGeneration(token, schema[curr_col_idx]);
+            this->internal_array->append(new String(token));
 
             size_t size_of_next_col = 0;
             memcpy(&size_of_next_col, token + size_of_curr_col, sizeof(size_t));
@@ -57,35 +39,29 @@ public:
             size_of_curr_col = size_of_next_col;
             curr_col_idx++;
         }
-
     }
 
     // destructor
-    ~ColumnArray() {
-//        for (size_t i = 0; i < internal_array->array_size; i++) {
-//            if (internal_array->get(i) != nullptr) {
-//                delete internal_array->get(i);
-//            }
-//        }
+    ~StringArray() {
         delete internal_array;
     }
 
-    ColumnArray(ColumnArray* old) {
+    StringArray(StringArray *old) {
         this->internal_array = new Array(old->internal_array);
     }
 
     /* adds an element to the list at the given index
-    * @arg o: column to be added to this array
-    * @arg index: the index to add the column at
+    * @arg o: string to be added to this array
+    * @arg index: the index to add the string at
     */
-    void add(Column* o, size_t index) {
+    void add(String *o, size_t index) {
         this->internal_array->add(o, index);
     }
 
     /* adds an element to the end of the list
-    * @arg o: column to be added to this array
+    * @arg o: string to be added to this array
     */
-    void append(Column* o) {
+    void append(String *o) {
         this->internal_array->append(o);
     }
 
@@ -94,7 +70,7 @@ public:
     * @arg a: the array of elements to be added to this list
     * @arg index: the index at which to add the elements of the given array
     */
-    void add_all(Array* a, size_t index) {
+    void add_all(Array *a, size_t index) {
         this->internal_array->add_all(a, index);
     }
 
@@ -106,43 +82,43 @@ public:
     }
 
     /* gets the element in this array at the given index
-    * @arg index: the index to get the column at
+    * @arg index: the index to get the string at
     */
-    Column* get(size_t index) {
-        Object* output = this->internal_array->get(index);
+    String *get(size_t index) {
+        Object *output = this->internal_array->get(index);
         if (output == nullptr) return nullptr;
-        Column* s = dynamic_cast<Column*>(output);
+        String *s = dynamic_cast<String *>(output);
         if (s == nullptr) return nullptr;
         return s;
     }
 
-    /* gets the index of the given column, returning the index of the first match.
+    /* gets the index of the given string, returning the index of the first match.
     * returns the size + 1 of the Array if the object cannot be found
     * @arg o: object to get the index of
     */
-    size_t index_of(Column* o) {
+    size_t index_of(String *o) {
         return this->internal_array->index_of(o);
     }
 
     /* removes an element at the given index and returns it
-    * @arg index: the index at which to remove the column
+    * @arg index: the index at which to remove the string
     */
-    Column* remove(size_t index) {
-        Object* output = this->internal_array->remove(index);
+    String *remove(size_t index) {
+        Object *output = this->internal_array->remove(index);
         if (output == nullptr) return nullptr;
-        Column *s = dynamic_cast<Column*>(output);
+        String *s = dynamic_cast<String *>(output);
         if (s == nullptr) return nullptr;
         return s;
     }
 
     /* swaps an element at the given index with the given element
     * @arg index: index at which to swap the element
-    * @arg o: the column to swap
+    * @arg o: the string to swap
     */
-    Column* set(size_t index, Column* o) {
-        Object* output = this->internal_array->set(index, o);
+    String *set(size_t index, String *o) {
+        Object *output = this->internal_array->set(index, o);
         if (output == nullptr) return nullptr;
-        Column *s = dynamic_cast<Column*>(output);
+        String *s = dynamic_cast<String *>(output);
         if (s == nullptr) return nullptr;
         return s;
     }
@@ -161,21 +137,21 @@ public:
     }
 
     /*
-    * Checks equality between this array and a given column
-    * @arg other: the other column to check equality to
+    * Checks equality between this array and a given string
+    * @arg other: the other string to check equality to
     */
-    bool equals(Object* other) {
+    bool equals(Object *other) {
         if (other == nullptr) return false;
-        ColumnArray *s = dynamic_cast<ColumnArray*>(other);
+        StringArray *s = dynamic_cast<StringArray*>(other);
         if (s == nullptr) return false;
         return this->internal_array->equals(s->internal_array);
     }
 
-    Serialized serialize_object() override {
+
+    Serialized serialize_object() {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
             Serialized curr_col = this->get(i)->serialize_object();
-
             char schema_size_serailzied[sizeof(size_t)];
             memset(&schema_size_serailzied, 0, sizeof(size_t));
             memcpy(&schema_size_serailzied, &curr_col.size, sizeof(size_t));

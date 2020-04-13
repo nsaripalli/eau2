@@ -1,7 +1,7 @@
 #pragma once
 
 #include "column.h"
-#include "floatMetaArray.h"
+#include "../array/floatMetaArray.h"
 
 /*************************************************************************
  * FloatColumn::

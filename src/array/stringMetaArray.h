@@ -1,7 +1,7 @@
 #pragma once
 
 #include "metaArray.h"
-#include "string.h"
+#include "../primatives/string.h"
 
 /*
  * StringMetaArray ::

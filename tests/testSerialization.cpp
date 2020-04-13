@@ -1,12 +1,12 @@
-#include "../src/boolArray.h"
-#include "../src/floatArray.h"
-#include "../src/helper.h"
-#include "../src/intArray.h"
-#include "../src/object.h"
-#include "../src/strBuff.h"
-#include "../src/string.h"
-#include "../src/stringArray.h"
-#include "../src/message.h"
+#include "../src/array/boolArray.h"
+#include "../src/array/floatArray.h"
+#include "../src/primatives/helper.h"
+#include "../src/array/intArray.h"
+#include "../src/primatives/object.h"
+#include "../src/primatives/strBuff.h"
+#include "../src/primatives/string.h"
+#include "../src/array/stringArray.h"
+#include "../src/primatives/message.h"
 #include "../src/dataframe.h"
 
 int testboolMetaArray() {
@@ -288,7 +288,7 @@ int testRegularArrays() {
         itesting.append(1);
     }
 
-    char* testSerializationI = itesting.serialize_object();
+    char* testSerializationI = itesting.serialize_object().data;
     IntArray deSeralizedI(testSerializationI);
 
     assert(itesting.equals(&deSeralizedI));

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "column.h"
-#include "boolMetaArray.h"
+#include "../array/boolMetaArray.h"
 
 /*************************************************************************
  * BoolColumn::

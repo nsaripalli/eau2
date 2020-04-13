@@ -1,9 +1,9 @@
 #pragma once
 
 #include <cstdarg> // for varargs in all the children
-#include "string.h"
-#include "object.h"
-#include "serializableObject.h"
+#include "../primatives/string.h"
+#include "../primatives/object.h"
+#include "../primatives/serializableObject.h"
 
 // Include errors. seems to only work when not importing here.
 class IntColumn;

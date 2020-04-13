@@ -1,7 +1,7 @@
 #pragma once
 
 #include "column.h"
-#include "stringMetaArray.h"
+#include "../array/stringMetaArray.h"
 
 /*************************************************************************
  * StringColumn::

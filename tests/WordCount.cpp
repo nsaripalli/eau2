@@ -1,5 +1,5 @@
 #include "../src/dataframe.h"
-#include "../src/network.h"
+#include "../src/primatives/network.h"
 #include "../src/application.h"
 #include <thread>
 #include <bits/stdc++.h>

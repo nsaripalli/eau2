@@ -1,6 +1,6 @@
 #pragma once
 
-#include "object.h"
+#include "../primatives/object.h"
 
 /*
  * MetaArray ::

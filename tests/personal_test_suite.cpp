@@ -1,9 +1,9 @@
 #include <gtest/gtest.h>
 
-#include "../src/object.h"  // Your file with the CwC declaration of Object
-#include "../src/column.h"
-#include "../src/boolColumn.h"
-#include "../src/intColumn.h"
+#include "../src/primatives/object.h"  // Your file with the CwC declaration of Object
+#include "../src/columns/column.h"
+#include "../src/columns/boolColumn.h"
+#include "../src/columns/intColumn.h"
 #include "../src/dataframe.h"
 
 #define ASSERT_TRUE(a)  \

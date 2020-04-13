@@ -1,4 +1,4 @@
-#include "../src/network.h"
+#include "../src/primatives/network.h"
 #include <stdio.h> 
 
 int main(int argc, char *argv[]) {

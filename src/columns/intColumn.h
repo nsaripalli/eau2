@@ -1,7 +1,7 @@
 #pragma once
 
 #include "column.h"
-#include "intMetaArray.h"
+#include "../array/intMetaArray.h"
 
 /*************************************************************************
  * IntColumn::

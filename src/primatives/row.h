@@ -1,11 +1,11 @@
 #pragma once
 
 #include "schema.h"
-#include "array.h"
-#include "intArray.h"
-#include "boolArray.h"
-#include "floatArray.h"
-#include "stringArray.h"
+#include "../array/array.h"
+#include "../array/intArray.h"
+#include "../array/boolArray.h"
+#include "../array/floatArray.h"
+#include "../array/stringArray.h"
 #include "integer.h"
 #include "fielder.h"
 

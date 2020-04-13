@@ -13,8 +13,8 @@
 #include <fcntl.h>
 #include <thread>
 #include <csignal>
-#include "intMetaArray.h"
-#include "stringMetaArray.h"
+#include "../array/intMetaArray.h"
+#include "../array/stringMetaArray.h"
 
 /**
  * Useful helper for error logging / checking from socket functions

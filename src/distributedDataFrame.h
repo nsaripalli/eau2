@@ -22,17 +22,26 @@ public:
         this->maxIdx = 0;
     }
 
-    DistributedDataFrame(char* input) {
+    DistributedDataFrame(char *input) {
         Serialized raw = StrBuff::convert_back_to_original(input);
         char* serialized = raw.data;
 
-        size_t size_of_idx = 0;
-        memcpy(&size_of_idx, serialized, sizeof(size_t));
-        this->maxIdx = size_of_idx;
-
+        size_t serMaxIdx = 0;
+        memcpy(&serMaxIdx, serialized, sizeof(size_t));
         char *tok = serialized + sizeof(size_t);
 
+
+        size_t size_of_schema = 0;
+        memcpy(&size_of_schema, tok, sizeof(size_t));
+        tok = tok + sizeof(size_t);
+
+
         schema = new Schema(tok);
+
+        tok += size_of_schema;
+
+        columns = new ColumnArray(tok, schema->column_types->internal_list_);
+        delete[] raw.data;
     }
 
     virtual ~DistributedDataFrame() {
@@ -195,18 +204,48 @@ public:
         // All of the data is already in the kv store, so really we only need to serialize the schema and size.
 
         Serialized schemaSerialized = this->schema->serialize_object();
-//        Schema test(schemaSerialized);
 
+//        Max idx
         char max_idx_serialized[sizeof(size_t)];
         memset(&max_idx_serialized, 0, sizeof(size_t));
         memcpy(&max_idx_serialized, &this->maxIdx, sizeof(size_t));
 
+//        Sizeof Schema
+        size_t schema_size = schemaSerialized.size;
+        char schema_size_serailzied[sizeof(size_t)];
+        memset(&schema_size_serailzied, 0, sizeof(size_t));
+        memcpy(&schema_size_serailzied, &schema_size, sizeof(size_t));
+
+//        SubDF metaData
+        IntArray setDump;
+        for(auto f : createdSubDFs) {
+            setDump.append(f);
+        }
+
+//      The sub DFs.
+        Serialized subDFsSerialized = setDump.serialize_object();
+
         StrBuff internalBuffer;
+//      First maxIdx of DDF
         internalBuffer.c(max_idx_serialized, sizeof(size_t));
+//      Then size of Schema
+        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
+//      The Schema
         internalBuffer.c(schemaSerialized);
+//      The sub DFs
+        internalBuffer.c(subDFsSerialized);
+
         delete[] schemaSerialized.data;
-        return internalBuffer.getSerialization();
+
+        Serialized tmp = internalBuffer.getSerialization();
+
+        Serialized out = StrBuff::convert_to_escaped(tmp);
+
+        delete[] tmp.data;
+
+        return out;
     }
+
 
     virtual bool equals(Object *other) {
         if (other == nullptr) return false;

@@ -14,7 +14,7 @@
 *  author: shah.ash@husky.neu.edu | peters.ci@husky.neu.edu
 *  Implementation authors: dermer.s@husky.neu.edu & saripalli.n@northeastern.edu
 */
-class IntArray : public Object{
+class IntArray : public SerializableObject {
 public:
 
     size_t current_max_index;
@@ -245,8 +245,9 @@ public:
         return this->current_max_index;
     }  // Returns the hash code value for this list.
 
-    char * serialize_object() {
-        char* totalBytesArray = new char[sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(int))];
+    Serialized serialize_object() {
+        size_t size = sizeof(current_max_index) + sizeof(array_size) + (array_size * sizeof(int));
+        char* totalBytesArray = new char[size];
         char* bytesCurrent_max_index = totalBytesArray;
         char* bytesArray_size = totalBytesArray + sizeof(current_max_index);
         char*internalListSerialization = totalBytesArray + sizeof(current_max_index) + sizeof(array_size);
@@ -257,7 +258,7 @@ public:
 
         memcpy(internalListSerialization, internal_list_, array_size * sizeof(int));
 
-        return totalBytesArray;
+        return Serialized{size, totalBytesArray};
     }
 
 };

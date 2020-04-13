@@ -156,7 +156,7 @@ public:
     /**
      * 
      */
-    virtual void getAgain(Key &k);
+    virtual void getAgain(Key k);
 };
 
 /****************************************************************************
@@ -656,13 +656,12 @@ void KVStore::use(char *msg) {
     } else if (strcmp(tok, "BAD") == 0) { // key string
         tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, from);
-        std::thread t = std::thread(&KVStore::getAgain, this, std::ref(k));
+        std::thread t = std::thread(&KVStore::getAgain, this,k);
         t.detach();
     } 
 }
 
-void KVStore::getAgain(Key &k) {
-    sleep(2);
+void KVStore::getAgain(Key k) {
     DataFrame *df = dfq.front();
     dfq.pop();
     dfq.push(df);

@@ -67,7 +67,7 @@ public:
     DataFrame *getDataFrameWithRow(size_t row) {
         if (createdSubDFs.count(getDFID_(row)) != 0) {
             Key *key = getKeyForRow(row);
-            DataFrame *df = kv.get(*key);
+            DataFrame *df = kv.wait_and_get(*key);
             delete key;
             return df;
         }

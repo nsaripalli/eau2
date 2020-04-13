@@ -47,7 +47,7 @@ public:
 //      We need to sleep to make sure the other nodes are done computing.
 // Yes, this needs to be refactored, so we can request for unfinished data.
 // Our main goal this time was just to get the networking done.
-    sleep(10);
+//    sleep(10);
     DataFrame* result = kv->wait_and_get(verify);
     DataFrame* expected = kv->wait_and_get(check);
     pln(expected->get_int(0,0)==result->get_int(0,0) ? "SUCCESS":"FAILURE");

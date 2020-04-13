@@ -146,3 +146,4 @@ As of 4/6:
  - code review tech debt
  - refactoring file structures 
     - delete extra files
+   - Test serialization for distributed DataFrames

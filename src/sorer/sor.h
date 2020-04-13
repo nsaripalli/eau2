@@ -239,6 +239,7 @@ class SorAdapter {
 
         /**
          * Constructor for SorAdapter class that adapts to a DistributedDataFrame
+         * Authors: SD & NS
          */
         SorAdapter(
             unsigned int from,
@@ -317,6 +318,9 @@ class SorAdapter {
         }
 };
 
+/**
+ * Authors: SD & NS
+ */
 DataFrame* DataFrame::fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes) {
     String* uid = new String(key.keyString_.c_str());
     SorAdapter sa = SorAdapter(0, 5000, fileName, numNodes, kv, uid);

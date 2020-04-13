@@ -598,10 +598,13 @@ public:
 
     static DataFrame* fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes);
 
-    //    TODO what am I supposed to return?
+    // Creates a new dataframe with one row matching the schema and who has been accepted by the writer
     static DataFrame* fromVisitor(Key &pKey, KVStore &pStore, const char *string, Rower writer) {
-        DataFrame* df = new DataFrame(*(pStore.wait_and_get(pKey)));
-        df->map(writer);
+        Schema s = Schema(string);
+        DataFrame* df = new DataFrame(s);
+        Row r = Row(s);
+        writer.accept(r);
+        df->add_row(r);
         return df;
     }
 

@@ -97,13 +97,24 @@ public:
 
     SetWriter(Set& set): set_(set) { }
 
+    virtual Object* clone() { 
+        SetWriter* sw = new SetWriter(set_);
+        sw->i_ = i_;
+        return sw;
+    }
+
+    void join_delete(Rower* other) {
+        delete other;
+    }
+
     /** Skip over false values and stop when the entire set has been seen */
     bool done() {
         while (i_ < set_.size_ && set_.test(i_) == false) ++i_;
         return i_ == set_.size_;
     }
 
-    bool accept(Row & row) { row.set(0, i_++);
+    bool accept(Row & row) { 
+        row.set(0, i_++);
         return true;
     }
 };

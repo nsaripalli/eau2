@@ -1,3 +1,8 @@
+#include <cstddef>
+#include "../src/dataframe.h"
+#include "AppHelpers.h"
+#include "../src/application.h"
+
 /**
  * The input data is a processed extract from GitHub.
  *
@@ -14,10 +19,8 @@
  *                    -- and committed by user uid',
  **/
 
-#include <cstddef>
-#include "../src/dataframe.h"
-#include "AppHelpers.h"
-#include "../src/application.h"
+size_t num_nodes = 5;
+
 
 /**************************************************************************
  * A bit set contains size() booleans that are initialize to false and can
@@ -65,7 +68,6 @@ public:
     }
 };
 
-
 /*******************************************************************************
  * A SetUpdater is a reader that gets the first column of the data frame and
  * sets the corresponding value in the given set.
@@ -79,7 +81,7 @@ public:
     /** Assume a row with at least one column of type I. Assumes that there
      * are no missing. Reads the value and sets the corresponding position.
      * The return value is irrelevant here. */
-    bool visit(Row & row) { set_.set(row.get_int(0));  return false; }
+    bool accept(Row & row) { set_.set(row.get_int(0));  return false; }
 
 };
 
@@ -101,7 +103,9 @@ public:
         return i_ == set_.size_;
     }
 
-    void visit(Row & row) { row.set(0, i_++); }
+    bool accept(Row & row) { row.set(0, i_++);
+        return true;
+    }
 };
 
 /***************************************************************************
@@ -126,7 +130,7 @@ public:
     /** The data frame must have at least two integer columns. The newProject
      * set keeps track of projects that were newly tagged (they will have to
      * be communicated to other nodes). */
-    bool visit(Row & row) override {
+    bool accept(Row & row) override {
         int pid = row.get_int(0);
         int uid = row.get_int(1);
         if (uSet.test(uid))
@@ -155,7 +159,7 @@ public:
     UsersTagger(Set& pSet,Set& uSet, DataFrame* users):
             pSet(pSet), uSet(uSet), newUsers(users->nrows()) { }
 
-    bool visit(Row & row) override {
+    bool accept(Row & row) override {
         int pid = row.get_int(0);
         int uid = row.get_int(1);
         if (pSet.test(pid))
@@ -185,7 +189,7 @@ public:
     Set* uSet; // Linus' collaborators
     Set* pSet; // projects of collaborators
 
-    Linus(size_t idx, NetworkIfc& net): Application(idx, net) {}
+    Linus(size_t idx, const char* ip): Application(idx, ip) {}
 
     /** Compute DEGREES of Linus.  */
     void run_() override {
@@ -203,7 +207,7 @@ public:
         Key pK("projs");
         Key uK("usrs");
         Key cK("comts");
-        if (index == 0) {
+        if (this_node() == 0) {
             pln("Reading...");
             projects = DataFrame::fromFile(PROJ, pK.clone(), &kv);
             p("    ").p(projects->nrows()).pln(" projects");
@@ -256,9 +260,9 @@ public:
      */
     void merge(Set& set, char const* name, int stage) {
         if (this_node() == 0) {
-            for (size_t i = 1; i < arg.num_nodes; ++i) {
+            for (size_t i = 1; i < num_nodes; ++i) {
                 Key nK(StrBuff(name).c(stage).c("-").c(i).get());
-                DataFrame* delta = dynamic_cast<DataFrame*>(kv.waitAndGet(nK));
+                DataFrame* delta = dynamic_cast<DataFrame*>(kv->wait_and_get(nK));
                 p("    received delta of ").p(delta->nrows())
                         .p(" elements from node ").pln(i);
                 SetUpdater upd(set);
@@ -275,7 +279,7 @@ public:
             Key k(StrBuff(name).c(stage).c("-").c(index).get());
             delete DataFrame::fromVisitor(&k, &kv, "I", writer);
             Key mK(StrBuff(name).c(stage).c("-0").get());
-            DataFrame* merged = dynamic_cast<DataFrame*>(kv.waitAndGet(mK));
+            DataFrame* merged = dynamic_cast<DataFrame*>(kv->wait_and_get(mK));
             p("    receiving ").p(merged->nrows()).pln(" merged elements");
             SetUpdater upd(set);
             merged->map(upd);

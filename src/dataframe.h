@@ -187,7 +187,6 @@ public:
         char *tok = serialized + sizeof(size_t);
 
         schema = new Schema(tok);
-//        TODO be cleaner.
         columns = new ColumnArray(tok + size_of_schema, schema->column_types->internal_list_);
         delete[] raw.data;
     }
@@ -632,6 +631,7 @@ void KVStore::use(char *msg) {
     int to = atoi(tok);
     tok = multi_tok(nullptr, DELIMITER);
     printf("HEADER: %s\n", tok);
+//    fflush(stdout);
     if (to != idx_) { return; }
     if (strcmp(tok, "PUT") == 0) { // key string, df
         tok = multi_tok(nullptr, DELIMITER);
@@ -647,8 +647,8 @@ void KVStore::use(char *msg) {
             buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("BAD").c(DELIMITER).c(tok);
         } else {
             buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("RES").c(DELIMITER).c(get(k)->serialize_object());
-            client_->sendMessage(buff.get());
         }
+        client_->sendMessage(buff.get());
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, DELIMITER);
         dfq.front()->mutateToNewData(tok);
@@ -656,7 +656,7 @@ void KVStore::use(char *msg) {
     } else if (strcmp(tok, "BAD") == 0) { // key string
         tok = multi_tok(nullptr, DELIMITER);
         Key k = Key(tok, from);
-        std::thread t = std::thread(&KVStore::getAgain, this, k);
+        std::thread t = std::thread(&KVStore::getAgain, this, std::ref(k));
         t.detach();
     } 
 }

@@ -204,8 +204,6 @@ public:
 
     Linus(size_t idx, const char* ip): Application(idx, ip) {}
 //    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
-//    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
-//    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
 
     /** Compute DEGREES of Linus.  */
     void run_() override {

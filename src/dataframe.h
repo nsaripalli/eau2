@@ -57,8 +57,8 @@ char *multi_tok(char *input, const char *delimiter) {
 class Key {
 public:
     std::string keyString_;
-    int idx_;
 
+    int idx_;
     /**
      * Creates a key with the c++ string built to the given
      * key value and the index set to the given index.
@@ -75,6 +75,19 @@ public:
     Key(String* k, size_t i) {
         keyString_ = std::string(k->cstr_);
         idx_ = 0;
+    }
+
+    Key(const char *string) : Key(string, 0) {
+
+    }
+
+
+    Key(char *string) : Key(string, 0) {
+
+    }
+
+    Key &clone() {
+        return *new Key(keyString_.c_str(), idx_);
     }
 };
 
@@ -605,9 +618,6 @@ public:
         delete[] tmp.data;
         return out;
     }
-
-    static DataFrame *fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes);
-
     bool equals(Object *other) override;
 };
 

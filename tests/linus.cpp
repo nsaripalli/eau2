@@ -1,5 +1,5 @@
 #include <cstddef>
-#include "../src/dataframe.h"
+#include "../src/distributedDataFrame.h"
 #include "AppHelpers.h"
 #include "../src/application.h"
 
@@ -32,8 +32,8 @@ public:
     bool* vals_;  // owned; data
     size_t size_; // number of elements
 
-    /** Creates a set of the same size as the dataframe. */
-    Set(DataFrame* df) : Set(df->nrows()) {}
+    /** Creates a set of the same size as the DistributedDataFrame. */
+    Set(DistributedDataFrame* df) : Set(df->nrows()) {}
 
     /** Creates a set of the given size. */
     Set(size_t sz) :  vals_(new bool[sz]), size_(sz) {
@@ -87,7 +87,7 @@ public:
 
 /*****************************************************************************
  * A SetWriter copies all the values present in the set into a one-column
- * dataframe. The data contains all the values in the set. The dataframe has
+ * DistributedDataFrame. The data contains all the values in the set. The DistributedDataFrame has
  * at least one integer column.
  ****************************************************************************/
 class SetWriter: public Writer {
@@ -111,7 +111,7 @@ public:
 /***************************************************************************
  * The ProjectTagger is a reader that is mapped over commits, and marks all
  * of the projects to which a collaborator of Linus committed as an author.
- * The commit dataframe has the form:
+ * The commit DistributedDataFrame has the form:
  *    pid x uid x uid
  * where the pid is the identifier of a project and the uids are the
  * identifiers of the author and committer. If the author is a collaborator
@@ -124,7 +124,7 @@ public:
     Set& pSet; // set of projects of collaborators
     Set newProjects;  // newly tagged collaborator projects
 
-    ProjectsTagger(Set& uSet, Set& pSet, DataFrame* proj):
+    ProjectsTagger(Set& uSet, Set& pSet, DistributedDataFrame* proj):
             uSet(uSet), pSet(pSet), newProjects(proj) {}
 
     /** The data frame must have at least two integer columns. The newProject
@@ -145,7 +145,7 @@ public:
 /***************************************************************************
  * The UserTagger is a reader that is mapped over commits, and marks all of
  * the users which commmitted to a project to which a collaborator of Linus
- * also committed as an author. The commit dataframe has the form:
+ * also committed as an author. The commit DistributedDataFrame has the form:
  *    pid x uid x uid
  * where the pid is the idefntifier of a project and the uids are the
  * identifiers of the author and committer.
@@ -156,7 +156,7 @@ public:
     Set& uSet;
     Set newUsers;
 
-    UsersTagger(Set& pSet,Set& uSet, DataFrame* users):
+    UsersTagger(Set& pSet,Set& uSet, DistributedDataFrame* users):
             pSet(pSet), uSet(uSet), newUsers(users->nrows()) { }
 
     bool accept(Row & row) override {
@@ -183,13 +183,16 @@ public:
     const char* PROJ = "datasets/projects.ltgt";
     const char* USER = "datasets/users.ltgt";
     const char* COMM = "datasets/commits.ltgt";
-    DataFrame* projects; //  pid x project name
-    DataFrame* users;  // uid x user name
-    DataFrame* commits;  // pid x uid x uid
+    DistributedDataFrame* projects; //  pid x project name
+    DistributedDataFrame* users;  // uid x user name
+    DistributedDataFrame* commits;  // pid x uid x uid
     Set* uSet; // Linus' collaborators
     Set* pSet; // projects of collaborators
 
     Linus(size_t idx, const char* ip): Application(idx, ip) {}
+//    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
+//    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
+//    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
 
     /** Compute DEGREES of Linus.  */
     void run_() override {
@@ -198,10 +201,10 @@ public:
     }
 
     /** Node 0 reads three files, cointainng projects, users and commits, and
-     *  creates thre dataframes. All other nodes wait and load the three
-     *  dataframes. Once we know the size of users and projects, we create
+     *  creates thre DistributedDataFrames. All other nodes wait and load the three
+     *  DistributedDataFrames. Once we know the size of users and projects, we create
      *  sets of each (uSet and pSet). We also output a data frame with a the
-     *  'tagged' users. At this point the dataframe consists of only
+     *  'tagged' users. At this point the DistributedDataFrame consists of only
      *  Linus. **/
     void readInput() {
         Key pK("projs");
@@ -209,18 +212,18 @@ public:
         Key cK("comts");
         if (this_node() == 0) {
             pln("Reading...");
-            projects = DataFrame::fromFile(PROJ, pK.clone(), &kv);
+            projects = DistributedDataFrame::fromFile(PROJ, pK.clone(), kv, num_nodes);
             p("    ").p(projects->nrows()).pln(" projects");
-            users = DataFrame::fromFile(USER, uK.clone(), &kv);
+            users = DistributedDataFrame::fromFile(USER, uK.clone(), &kv);
             p("    ").p(users->nrows()).pln(" users");
-            commits = DataFrame::fromFile(COMM, cK.clone(), &kv);
+            commits = DistributedDataFrame::fromFile(COMM, cK.clone(), &kv);
             p("    ").p(commits->nrows()).pln(" commits");
-            // This dataframe contains the id of Linus.
-            delete DataFrame::fromScalar(new Key("users-0-0"), &kv, LINUS);
+            // This DistributedDataFrame contains the id of Linus.
+            delete DistributedDataFrame::fromScalar(new Key("users-0-0"), kv, num_nodes, LINUS);
         } else {
-            projects = dynamic_cast<DataFrame*>(kv->wait_and_get(pK));
-            users = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
-            commits = dynamic_cast<DataFrame*>(kv->wait_and_get(cK));
+            projects = dynamic_cast<DistributedDataFrame*>(kv->wait_and_get(pK));
+            users = dynamic_cast<DistributedDataFrame*>(kv->wait_and_get(uK));
+            commits = dynamic_cast<DistributedDataFrame*>(kv->wait_and_get(cK));
         }
         uSet = new Set(users);
         pSet = new Set(projects);
@@ -232,9 +235,9 @@ public:
     void step(int stage) {
         p("Stage ").pln(stage);
         // Key of the shape: users-stage-0
-        Key uK(StrBuff("users-").c(stage).c("-0").get());
+        Key uK(reinterpret_cast<const char *>(StrBuff("users-").c(stage).c("-0").get()));
         // A df with all the users added on the previous round
-        DataFrame* newUsers = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
+        DistributedDataFrame* newUsers = dynamic_cast<DistributedDataFrame*>(kv->wait_and_get(uK));
         Set delta(users);
         SetUpdater upd(delta);
         newUsers->map(upd); // all of the new users are copied to delta.
@@ -253,7 +256,7 @@ public:
     }
 
     /** Gather updates to the given set from all the nodes in the systems.
-     * The union of those updates is then published as dataframe.  The key
+     * The union of those updates is then published as DistributedDataFrame.  The key
      * used for the otuput is of the form "name-stage-0" where name is either
      * 'users' or 'projects', stage is the degree of separation being
      * computed.
@@ -261,8 +264,8 @@ public:
     void merge(Set& set, char const* name, int stage) {
         if (this_node() == 0) {
             for (size_t i = 1; i < num_nodes; ++i) {
-                Key nK(StrBuff(name).c(stage).c("-").c(i).get());
-                DataFrame* delta = dynamic_cast<DataFrame*>(kv->wait_and_get(nK));
+                Key nK(reinterpret_cast<const char *>(StrBuff(name).c(stage).c("-").c(i).get()));
+                DistributedDataFrame* delta = dynamic_cast<DistributedDataFrame*>(kv->wait_and_get(nK));
                 p("    received delta of ").p(delta->nrows())
                         .p(" elements from node ").pln(i);
                 SetUpdater upd(set);
@@ -271,15 +274,15 @@ public:
             }
             p("    storing ").p(set.size()).pln(" merged elements");
             SetWriter writer(set);
-            Key k(StrBuff(name).c(stage).c("-0").get());
-            delete DataFrame::fromVisitor(&k, &kv, "I", writer);
+            Key k(reinterpret_cast<const char *>(StrBuff(name).c(stage).c("-0").get()));
+            delete DistributedDataFrame::fromVisitor(&k, &kv, "I", writer);
         } else {
             p("    sending ").p(set.size()).pln(" elements to master node");
             SetWriter writer(set);
-            Key k(StrBuff(name).c(stage).c("-").c(index).get());
-            delete DataFrame::fromVisitor(&k, &kv, "I", writer);
-            Key mK(StrBuff(name).c(stage).c("-0").get());
-            DataFrame* merged = dynamic_cast<DataFrame*>(kv->wait_and_get(mK));
+            Key k(reinterpret_cast<char *>(StrBuff(name).c(stage).c("-").c(this->this_node()).get()));
+            delete DistributedDataFrame::fromVisitor(&k, &kv, "I", writer);
+            Key mK(reinterpret_cast<char *>(StrBuff(name).c(stage).c("-0").get()));
+            DistributedDataFrame* merged = dynamic_cast<DistributedDataFrame*>(kv->wait_and_get(mK));
             p("    receiving ").p(merged->nrows()).pln(" merged elements");
             SetUpdater upd(set);
             merged->map(upd);

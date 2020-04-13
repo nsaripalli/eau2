@@ -133,8 +133,10 @@ As of 4/6:
 
 As of 4/13 
 
+  - we have a distributed dataframe that distributes in equal chunks (by row) across the nodes.
+
   - Our linus demo matches our api / the customers wishes
 
   - Linus compiles
 
-  
+  - We integrated Sorer (with dataframes and distributed dataframes) from TeamRP

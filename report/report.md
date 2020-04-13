@@ -131,19 +131,10 @@ As of 4/6:
   to show an alternative straightforward way to implement similar functionality with
   our design / architecture in mind. 
 
-4/9 TODO:
+As of 4/13 
 
- - Follow up with JAN for grade grubbing
- - Integrate SORER
- - Chunk the data into smaller dataframes
-    - Distribute it
- - Wait and Get tech debt (1 get at a time)
-    - Try again until key exists
- - Tests
-    - meta array 
-    - Trivial app but over the network 
- - Make keys not have idx  
- - code review tech debt
- - refactoring file structures 
-    - delete extra files
-   - Test serialization for distributed DataFrames
+  - Our linus demo matches our api / the customers wishes
+
+  - Linus compiles
+
+  

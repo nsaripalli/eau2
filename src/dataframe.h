@@ -708,7 +708,9 @@ DataFrame *KVStore::get(Key &key) {
         client_->sendMessage(buff.get());
         return df;
     } else {
-        return map.at(key.keyString_);
+        DataFrame *df = map.at(key.keyString_);
+        df->hasBeenMutated = true;
+        return df;
     }
 }
 

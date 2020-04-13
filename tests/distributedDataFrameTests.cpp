@@ -51,7 +51,7 @@ int testSimple() {
     assert(df.ncols() == normalDF.ncols());
     return 0;
 }
-
+// This is to test distributed data frames
 int main() {
     testSimple();
 }

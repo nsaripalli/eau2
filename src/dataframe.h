@@ -600,7 +600,7 @@ public:
 
     // Creates a new dataframe with one row matching the schema and who has been accepted by the writer
     static DataFrame* fromVisitor(Key &pKey, KVStore &pStore, const char *string, Rower& writer) {
-        Schema s = Schema(string);
+        Schema s(string);
         DataFrame* df = new DataFrame(s);
         Rower* w = &writer;
         while (!w->done()) {

@@ -1,20 +1,33 @@
 #pragma once
+
 #include "dataframe.h"
 #include <set>
 
 size_t numRowsOfEachMetaDF = 1000;
 
+/**
+ * This is a DataFrame class that uses DataFrames internally to spread out the data among differnet nodes.
+ * It mimics the same behavior as regular DataFrames so a user should see no differnece. It uses the KV store to
+ * split up the data internally to spread the data among all of the nodes.
+ */
 class DistributedDataFrame : public DataFrame {
 public:
     size_t numOfNodes;
     Schema *schema;
     KVStore kv;
     String *uniqueID;
-    std::set <int> createdSubDFs;
+    std::set<int> createdSubDFs;
 
     size_t maxIdx;
 
-    DistributedDataFrame(Schema &schema, size_t numOfNodes, KVStore kvStore, String *unique_ID) {
+    /**
+     * A constructor for Distributed DataFrames
+     * @param schema The Schema
+     * @param numOfNodes The number of nodes in the KVStore
+     * @param kvStore The KVSTore
+     * @param unique_ID A Unique String on the KVStore. This unique ID is used to put data into the KV store internally.
+     */
+    DistributedDataFrame(Schema &schema, size_t numOfNodes, KVStore &kvStore, String *unique_ID) {
         this->schema = new Schema(schema);
         this->numOfNodes = numOfNodes;
         this->kv = kvStore;
@@ -24,7 +37,7 @@ public:
 
     DistributedDataFrame(char *input) {
         Serialized raw = StrBuff::convert_back_to_original(input);
-        char* serialized = raw.data;
+        char *serialized = raw.data;
 
         size_t serMaxIdx = 0;
         memcpy(&serMaxIdx, serialized, sizeof(size_t));
@@ -61,7 +74,7 @@ public:
     Key *getKeyForRow(size_t rowNum) {
         StrBuff buff = StrBuff();
         buff.c(*uniqueID);
-        buff.c((int)this->getDFID_(rowNum));
+        buff.c((int) this->getDFID_(rowNum));
         return new Key(buff.get(), getNodeIDOfRowNumber_(rowNum));
     }
 
@@ -79,8 +92,7 @@ public:
             DataFrame *df = kv.get(*key);
             delete key;
             return df;
-        }
-        else {
+        } else {
             Key *key = getKeyForRow(row);
             return new DataFrame(*this->schema);
         }
@@ -89,7 +101,7 @@ public:
 
     void setDataFrameWithRow(size_t row, DataFrame *df) {
         createdSubDFs.insert(getDFID_(row));
-        Key* key = getKeyForRow(row);
+        Key *key = getKeyForRow(row);
         kv.put(*key, df);
         if (row > this->maxIdx) {
             this->maxIdx = row;
@@ -98,10 +110,12 @@ public:
 //        delete df;
     }
 
+//    For eventual caching.
     void delDataFrameWithRow(size_t row, DataFrame *df) {
 //        delete df;
     }
 
+    //    For eventual caching.
     virtual void add_column(Column *col, String *name) {
 //        TODO do this
     }
@@ -218,7 +232,7 @@ public:
 
 //        SubDF metaData
         IntArray setDump;
-        for(auto f : createdSubDFs) {
+        for (auto f : createdSubDFs) {
             setDump.append(f);
         }
 

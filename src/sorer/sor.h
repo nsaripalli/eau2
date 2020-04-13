@@ -5,9 +5,9 @@
 #include <iostream>
 #include <vector>
 #include "type.h"
-#include "dataframe.h"
+#include "../dataframe.h"
 #include "util.h"
-#include "distributedDataFrame.h"
+#include "../distributedDataFrame.h"
 
 using namespace std;
 
@@ -246,7 +246,7 @@ class SorAdapter {
             unsigned int length,
             const char* filename,
             int numNodes,
-            KVStore kv,
+            KVStore& kv,
             String *uid
         ) {
             string file = string(filename);
@@ -314,7 +314,7 @@ class SorAdapter {
 
         ~SorAdapter() {
             //Delete df
-            delete df_;
+//            delete df_;
         }
 };
 

@@ -2,6 +2,7 @@
 #include "../src/dataframe.h"
 #include "AppHelpers.h"
 #include "../src/application.h"
+#include "../src/sorer/sor.h"
 
 /**
  * The input data is a processed extract from GitHub.
@@ -189,7 +190,8 @@ public:
  **************************************************************************/
 class Linus : public Application {
 public:
-    int DEGREES = 4;  // How many degrees of separation form linus?
+    int DEGREES = 1;  // How many degrees of separation form linus?
+//    int DEGREES = 4;  // How many degrees of separation form linus?
     int LINUS = 4967;   // The uid of Linus (offset in the user df)
     const char* PROJ = "datasets/projects.ltgt";
     const char* USER = "datasets/users.ltgt";
@@ -230,7 +232,8 @@ public:
             commits = DataFrame::fromFile(COMM, cK.clone(), *kv, num_nodes);
             p("    ").p(commits->nrows()).pln(" commits");
             // This DataFrame contains the id of Linus.
-            delete DataFrame::fromScalar(new Key("users-0-0"), kv, LINUS);
+//            delete?
+            DataFrame::fromScalar(new Key("users-0-0"), kv, LINUS);
         } else {
             projects = dynamic_cast<DataFrame*>(kv->wait_and_get(pK));
             users = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
@@ -246,13 +249,13 @@ public:
     void step(int stage) {
         p("Stage ").pln(stage);
         // Key of the shape: users-stage-0
-        Key uK(reinterpret_cast<const char *>(StrBuff("users-").c(stage).c("-0").get()));
+        Key uK(StrBuff("users-").c(stage).c("-0").get()->c_str());
         // A df with all the users added on the previous round
-        DataFrame* newUsers = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
+        DataFrame* newUsers = kv->wait_and_get(uK);
         Set delta(users);
         SetUpdater upd(delta);
         newUsers->map(upd); // all of the new users are copied to delta.
-        delete newUsers;
+//        delete newUsers;
         ProjectsTagger ptagger(delta, *pSet, projects);
         commits->local_map(ptagger); // marking all projects touched by delta
         merge(ptagger.newProjects, "projects-", stage);
@@ -275,29 +278,37 @@ public:
     void merge(Set& set, char const* name, int stage) {
         if (this_node() == 0) {
             for (size_t i = 1; i < num_nodes; ++i) {
-                Key nK(reinterpret_cast<const char *>(StrBuff(name).c(stage).c("-").c(i).get()));
-                DataFrame* delta = dynamic_cast<DataFrame*>(kv->wait_and_get(nK));
+                Key nK(StrBuff(name).c(stage).c("-").c(i).get()->c_str());
+                DataFrame* delta = kv->wait_and_get(nK);
                 p("    received delta of ").p(delta->nrows())
                         .p(" elements from node ").pln(i);
                 SetUpdater upd(set);
                 delta->map(upd);
-                delete delta;
+//                delete delta;
             }
             p("    storing ").p(set.size()).pln(" merged elements");
             SetWriter writer(set);
-            Key k(reinterpret_cast<const char *>(StrBuff(name).c(stage).c("-0").get()));
-            delete DataFrame::fromVisitor(k, *kv, "I", writer);
+            Key k(StrBuff(name).c(stage).c("-0").get()->c_str());
+//            delete
+            DataFrame::fromVisitor(k, *kv, "I", writer);
         } else {
             p("    sending ").p(set.size()).pln(" elements to master node");
             SetWriter writer(set);
-            Key k(reinterpret_cast<char *>(StrBuff(name).c(stage).c("-").c(this->this_node()).get()));
-            delete DataFrame::fromVisitor(k, *kv, "I", writer);
-            Key mK(reinterpret_cast<char *>(StrBuff(name).c(stage).c("-0").get()));
-            DataFrame* merged = dynamic_cast<DataFrame*>(kv->wait_and_get(mK));
+            Key k(StrBuff(name).c(stage).c("-").c(this->this_node()).get()->c_str());
+//            delete
+             DataFrame::fromVisitor(k, *kv, "I", writer);
+            Key mK(StrBuff(name).c(stage).c("-0").get()->c_str());
+            DataFrame* merged = kv->wait_and_get(mK);
             p("    receiving ").p(merged->nrows()).pln(" merged elements");
             SetUpdater upd(set);
             merged->map(upd);
-            delete merged;
+//            delete merged;
         }
     }
 }; // Linus
+
+int main() {
+    Linus* producer = new Linus(0, "127.0.0.2");
+    producer->run_();
+    while(!producer->done());
+}

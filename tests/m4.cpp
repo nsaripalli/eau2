@@ -2,7 +2,7 @@
 #include "../src/network.h"
 #include "../src/application.h"
 #include <thread>
-
+// TODO THIS WILL NOT WORK. PLEASE USE WORDCOUNT AS M4 INSTEAD.
 class FileReader {
 public:
     /** Reads next word and stores it in the row. Actually read the word.

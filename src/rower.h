@@ -21,4 +21,6 @@ public:
         is reponsible for cleaning up memory. */
     virtual void join_delete(Rower* other) {
     }
+
+    virtual bool done() {}
 };

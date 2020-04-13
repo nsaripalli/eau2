@@ -397,6 +397,10 @@ public:
         map_chunk_(r, 0, nrows());
     }
 
+    virtual void local_map(Rower &r) {
+        map(r);
+    }
+
     virtual /** This method clones the Rower and executes the map in parallel. Join is
      * used at the end to merge the results. */
     void pmap(Rower &r) {
@@ -589,6 +593,15 @@ public:
         df->set(0, 0, scalar);
         delete s;
         kv->put(*key, df);
+        return df;
+    }
+
+    static DataFrame* fromFile(const char* fileName, Key &key, KVStore &kv, int numNodes);
+
+    //    TODO what am I supposed to return?
+    static DataFrame* fromVisitor(Key &pKey, KVStore &pStore, const char *string, Rower writer) {
+        DataFrame* df = new DataFrame(*(pStore.wait_and_get(pKey)));
+        df->map(writer);
         return df;
     }
 

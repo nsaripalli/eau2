@@ -10,6 +10,11 @@
  *  author: jv */
 class StrBuff : public Object {
 public:
+
+    StrBuff(const char *string): StrBuff() {
+        this->c(string);
+    }
+
     char *val_; // owned; consumed by get()
     size_t capacity_;
     size_t size_;

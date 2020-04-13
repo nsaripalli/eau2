@@ -14,6 +14,11 @@
  *                    -- and committed by user uid',
  **/
 
+#include <cstddef>
+#include "../src/dataframe.h"
+#include "AppHelpers.h"
+#include "../src/application.h"
+
 /**************************************************************************
  * A bit set contains size() booleans that are initialize to false and can
  * be set to true with the set() method. The test() method returns the
@@ -207,11 +212,11 @@ public:
             commits = DataFrame::fromFile(COMM, cK.clone(), &kv);
             p("    ").p(commits->nrows()).pln(" commits");
             // This dataframe contains the id of Linus.
-            delete DataFrame::fromScalarInt(new Key("users-0-0"), &kv, LINUS);
+            delete DataFrame::fromScalar(new Key("users-0-0"), &kv, LINUS);
         } else {
-            projects = dynamic_cast<DataFrame*>(kv.waitAndGet(pK));
-            users = dynamic_cast<DataFrame*>(kv.waitAndGet(uK));
-            commits = dynamic_cast<DataFrame*>(kv.waitAndGet(cK));
+            projects = dynamic_cast<DataFrame*>(kv->wait_and_get(pK));
+            users = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
+            commits = dynamic_cast<DataFrame*>(kv->wait_and_get(cK));
         }
         uSet = new Set(users);
         pSet = new Set(projects);
@@ -225,7 +230,7 @@ public:
         // Key of the shape: users-stage-0
         Key uK(StrBuff("users-").c(stage).c("-0").get());
         // A df with all the users added on the previous round
-        DataFrame* newUsers = dynamic_cast<DataFrame*>(kv.waitAndGet(uK));
+        DataFrame* newUsers = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
         Set delta(users);
         SetUpdater upd(delta);
         newUsers->map(upd); // all of the new users are copied to delta.

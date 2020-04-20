@@ -48,7 +48,7 @@ public:
         memcpy(&size_of_curr_col, input, sizeof(size_t));
         char* token=input + sizeof(size_t);
 
-        while (size_of_curr_col != SIZE_MAX) {
+        while (size_of_curr_col != 0) {
             handleNestedArrayGeneration(token, schema[curr_col_idx]);
 
             size_t size_of_next_col = 0;
@@ -171,6 +171,7 @@ public:
         return this->internal_array->equals(s->internal_array);
     }
 
+
     Serialized serialize_object() override {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {
@@ -185,7 +186,7 @@ public:
             delete [] curr_col.data;
         }
 
-        size_t max = SIZE_MAX;
+        size_t max = 0;
         char schema_size_serailzied[sizeof(size_t)];
         memset(&schema_size_serailzied, 0, sizeof(size_t));
         memcpy(&schema_size_serailzied, &max, sizeof(size_t));

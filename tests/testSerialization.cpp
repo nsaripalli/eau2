@@ -182,6 +182,47 @@ int testColumnArray() {
 
     return 0;
 }
+int testBasicStringColumnArray() {
+    ColumnArray originalColArray;
+
+    StringColumn originalIntColumn;
+    String t("test");
+
+
+    Serialized s = originalColArray.serialize_object();
+    char* serialized = s.data;
+    const char* schema = "S";
+    ColumnArray dupColArray(serialized, (char*) schema);
+    assert(originalColArray.equals(&dupColArray));
+
+//    delete schema;
+    delete[] serialized;
+
+    return 0;
+}
+
+int testStringColumnArray() {
+    ColumnArray originalColArray;
+
+    StringColumn originalIntColumn;
+    String t("test");
+    for (int i = 0; i < 1000; i++) {
+        originalIntColumn.push_back(&t);
+    }
+
+    originalColArray.append(&originalIntColumn);
+
+    Serialized s = originalColArray.serialize_object();
+    char* serialized = s.data;
+    const char* schema = "S";
+    ColumnArray dupColArray(serialized, (char*) schema);
+    assert(originalColArray.equals(&dupColArray));
+
+//    delete schema;
+    delete[] serialized;
+
+    return 0;
+}
 
 int testIntDF() {
     Schema s("I");
@@ -320,4 +361,6 @@ int main() {
     testColumnArray();
     testDF();
     testStringArray();
+    testBasicStringColumnArray();
+    testStringColumnArray();
 }

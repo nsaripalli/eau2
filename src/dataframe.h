@@ -219,7 +219,6 @@ public:
         char* serialized = raw.data;
         printf("%zu\n", raw.size);
 
-        const char* dup = "THIS IS A TEST TO SEE IF WHAT WE HAVE IS ALL GOOD\0 YEAH I KNOW THIS IS GREAT";
         size_t size_of_schema = 0;
         memcpy(&size_of_schema, serialized, sizeof(size_t));
         char *tok = serialized + sizeof(size_t);

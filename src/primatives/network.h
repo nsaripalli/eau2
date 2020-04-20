@@ -277,6 +277,7 @@ public:
      * NOTE: Blocking
      */
     virtual void start() {
+        sleep(1);
         while (!done) {
             // accepting connections
             int cd = sock->socketAccept();

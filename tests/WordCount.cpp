@@ -41,7 +41,7 @@ public:
         std::string word, t, q, filename;
 
         // filename of the file
-        filename = "file.txt";
+        filename = "/home/nsaripalli/CLionProjects/eau2/tests/file.txt";
 
         // opening file
         file.open(filename.c_str());

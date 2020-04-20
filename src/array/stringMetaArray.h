@@ -112,7 +112,7 @@ public:
         memset(&schema_size_serailzied, 0, sizeof(size_t));
         memcpy(&schema_size_serailzied, &max, sizeof(size_t));
 
-        internalBuffer.c(schema_size_serailzied);
+        internalBuffer.c(schema_size_serailzied, sizeof(size_t));
 
         return internalBuffer.getSerialization();
     }

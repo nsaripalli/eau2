@@ -74,7 +74,7 @@ public:
 
         for ( const auto &p : wordMap )
         {
-            out->set(0, curr_idx, p.first);
+            out->set(0, curr_idx, new String(p.first));
             out->set(1, curr_idx, p.second);
             curr_idx++;
         }
@@ -96,7 +96,7 @@ public:
 
         for ( const auto &p : wordMap )
         {
-            out->set(0, curr_idx, p.first);
+            out->set(0, curr_idx, new String(p.first));
             out->set(1, curr_idx, p.second);
             curr_idx++;
         }
@@ -118,7 +118,7 @@ public:
 
         for ( const auto &p : wordMap )
         {
-            out->set(0, curr_idx, p.first);
+            out->set(0, curr_idx, new String(p.first));
             out->set(1, curr_idx, p.second);
             curr_idx++;
         }
@@ -127,7 +127,6 @@ public:
     }
 
     void summarizer() {
-        sleep(100);
         DataFrame* c1DF = kv->wait_and_get(c1);
         DataFrame* c2DF = kv->wait_and_get(c2);
         DataFrame* c3DF = kv->wait_and_get(c3);

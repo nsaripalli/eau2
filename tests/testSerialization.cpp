@@ -224,6 +224,35 @@ int testStringColumnArray() {
     return 0;
 }
 
+int testComplexStringINTColumnArray() {
+    ColumnArray originalColArray;
+
+    StringColumn originalStrColumn;
+    String t("test");
+    for (int i = 0; i < 1000; i++) {
+        originalStrColumn.push_back(&t);
+    }
+
+    IntColumn originalIntColumn;
+    for (int i = 0; i < 100; i++) {
+        originalIntColumn.push_back(i);
+    }
+
+    originalColArray.append(&originalStrColumn);
+    originalColArray.append(&originalIntColumn);
+
+    Serialized s = originalColArray.serialize_object();
+    char* serialized = s.data;
+    const char* schema = "SI";
+    ColumnArray dupColArray(serialized, (char*) schema);
+    assert(originalColArray.equals(&dupColArray));
+
+//    delete schema;
+    delete[] serialized;
+
+    return 0;
+}
+
 int testIntDF() {
     Schema s("I");
     DataFrame testingDF(s);
@@ -363,4 +392,5 @@ int main() {
     testStringArray();
     testBasicStringColumnArray();
     testStringColumnArray();
+    testComplexStringINTColumnArray();
 }

@@ -666,7 +666,7 @@ void KVStore::use(char *msg) {
     int to = atoi(tok);
     tok = multi_tok(nullptr, DELIMITER);
     printf("HEADER: %s\n", tok);
-//    fflush(stdout);
+    fflush(stdout);
     if (to != idx_) { return; }
     if (strcmp(tok, "PUT") == 0) { // key string, df
         tok = multi_tok(nullptr, DELIMITER);
@@ -697,7 +697,7 @@ void KVStore::use(char *msg) {
 }
 
 void KVStore::getAgain(Key k) {
-    sleep(1);
+    sleep(4);
     DataFrame *df = dfq.front();
     dfq.pop();
     dfq.push(df);

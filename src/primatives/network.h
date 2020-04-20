@@ -506,7 +506,7 @@ public:
 
             } else if (strcmp(tok, "MSG") == 0) {
                 // print the message after "MSG "
-                // printf("[Client %s] Message Received: \"%s\"\n", ip->c_str(), &(received->c_str()[4]));
+                 printf("[Client %s] Message Received: \"%s\"\n", ip->c_str(), &(received->c_str()[4]));
                 user_->use(&(received->c_str()[4]));
             } else if (strcmp(tok, "END") == 0) {
                 if (bg) {

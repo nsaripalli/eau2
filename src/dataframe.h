@@ -23,29 +23,33 @@
 #include <map>
 #include <queue>
 //#include "KVStore.h"
+pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 
 // Credit to https://stackoverflow.com/a/29789623 for this function
-char *multi_tok(char *input, const char *delimiter) {
-    static char *string;
+typedef char *multi_tok_t;
+
+char *multi_tok(char *input, multi_tok_t *string, const char *delimiter) {
     if (input != NULL)
-        string = input;
+        *string = input;
 
-    if (string == NULL)
-        return string;
+    if (*string == NULL)
+        return *string;
 
-    char *end = strstr(string, delimiter);
+    char *end = strstr(*string, delimiter);
     if (end == NULL) {
-        char *temp = string;
-        string = NULL;
+        char *temp = *string;
+        *string = NULL;
         return temp;
     }
 
-    char *temp = string;
+    char *temp = *string;
 
     *end = '\0';
-    string = end + strlen(delimiter);
+    *string = end + strlen(delimiter);
     return temp;
 }
+
+multi_tok_t init() { return NULL; }
 
 
 /**
@@ -658,24 +662,25 @@ void KVStore::put(Key &k, DataFrame *df) {
 }
 
 void KVStore::use(char *msg) {
-    char *tok = multi_tok(msg, DELIMITER);
+    multi_tok_t s=init();
+    char *tok = multi_tok(msg, &s, DELIMITER);
     printf("FROM: %s\n", tok);
     int from = atoi(tok);
-    tok = multi_tok(nullptr, DELIMITER);
+    tok = multi_tok(nullptr, &s, DELIMITER);
     printf("TO: %s\n", tok);
     int to = atoi(tok);
-    tok = multi_tok(nullptr, DELIMITER);
+    tok = multi_tok(nullptr, &s, DELIMITER);
     printf("HEADER: %s\n", tok);
     fflush(stdout);
     if (to != idx_) { return; }
     if (strcmp(tok, "PUT") == 0) { // key string, df
-        tok = multi_tok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, &s, DELIMITER);
         Key k = Key(tok, to);
-        tok = multi_tok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, &s, DELIMITER);
         DataFrame *df = new DataFrame(tok);
         put(k, df);
     } else if (strcmp(tok, "GET") == 0) { // key string
-        tok = multi_tok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, &s, DELIMITER);
         Key k = Key(tok, to);
         StrBuff buff = StrBuff();
         if ( map.find(tok) == map.end() ) {
@@ -685,11 +690,13 @@ void KVStore::use(char *msg) {
         }
         client_->sendMessage(buff.get());
     } else if (strcmp(tok, "RES") == 0) { // df
-        tok = multi_tok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, &s, DELIMITER);
+        pthread_mutex_lock(&mutex);
         dfq.front()->mutateToNewData(tok);
         dfq.pop();
+        pthread_mutex_unlock(&mutex);
     } else if (strcmp(tok, "BAD") == 0) { // key string
-        tok = multi_tok(nullptr, DELIMITER);
+        tok = multi_tok(nullptr, &s, DELIMITER);
         Key k = Key(tok, from);
         std::thread t = std::thread(&KVStore::getAgain, this,k);
         t.detach();
@@ -697,10 +704,12 @@ void KVStore::use(char *msg) {
 }
 
 void KVStore::getAgain(Key k) {
-    sleep(4);
+    sleep(2);
+    pthread_mutex_lock(&mutex);
     DataFrame *df = dfq.front();
     dfq.pop();
     dfq.push(df);
+    pthread_mutex_unlock(&mutex);
     StrBuff buff = StrBuff();
     buff.c("MSG ").c(idx_).c(DELIMITER).c(k.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
             k.keyString_.c_str());
@@ -711,7 +720,9 @@ DataFrame *KVStore::get(Key &key) {
     if (key.idx_ != idx_) {
         Schema s("");
         DataFrame *df = new DataFrame(s);
+        pthread_mutex_lock(&mutex);
         dfq.push(df);
+        pthread_mutex_unlock(&mutex);
         StrBuff buff = StrBuff();
         buff.c("MSG ").c(idx_).c(DELIMITER).c(key.idx_).c(DELIMITER).c("GET").c(DELIMITER).c(
                 key.keyString_.c_str());

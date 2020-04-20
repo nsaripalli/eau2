@@ -133,14 +133,14 @@ public:
 
 
         std::map<char *, int, cmp_str> wordMap;
-        for(size_t i=0; i< c1DF->nrows() / 3; ++i) {
+        for(size_t i=0; i< c1DF->nrows(); ++i) {
             wordMap[c1DF->get_string(0, i)->cstr_] += 1;
         }
-        for(size_t i=0; i< c2DF->nrows() / 3; ++i) {
-            wordMap[c1DF->get_string(0, i)->cstr_] += 1;
+        for(size_t i=0; i< c2DF->nrows(); ++i) {
+            wordMap[c2DF->get_string(0, i)->cstr_] += 1;
         }
-        for(size_t i=0; i< c3DF->nrows() / 3; ++i) {
-            wordMap[c1DF->get_string(0, i)->cstr_] += 1;
+        for(size_t i=0; i< c3DF->nrows(); ++i) {
+            wordMap[c3DF->get_string(0, i)->cstr_] += 1;
         }
 
 //        https://stackoverflow.com/a/26282004/13221681
@@ -150,6 +150,7 @@ public:
                       << ':'
                       << x.second // string's value
                       << std::endl ;
+            fflush(stdout);
         }
     }
 };
@@ -160,7 +161,7 @@ int main(int argc, char *argv[]) {
     Demo* counter1 = new Demo(1, "127.0.0.3");
     Demo* counter2 = new Demo(2, "127.0.0.4");
     Demo* counter3 = new Demo(3, "127.0.0.5");
-    Demo* summarizer = new Demo(2, "127.0.0.6");
+    Demo* summarizer = new Demo(4, "127.0.0.6");
     reader->run_();
     std::thread t1 = std::thread(&Demo::run_, counter1);
     std::thread t2 = std::thread(&Demo::run_, counter2);

@@ -4,7 +4,7 @@
 #include <thread>
 #include <bits/stdc++.h>
 
-
+// Compares two char*s. For std map.
 struct cmp_str
 {
     bool operator()(char const *a, char const *b) const
@@ -32,6 +32,7 @@ public:
         }
     }
 
+//    This reads in a file and parses the word out into a df. This df is then distributed out.
     void reader() {
 //        https://www.geeksforgeeks.org/cpp-program-read-file-word-word/
 // Will read word by word and output a dataframe that is one column all all words.
@@ -60,6 +61,7 @@ public:
         kv->put(main, out);
     }
 
+//    Counts the first
     void counter1() {
         DataFrame* v = kv->wait_and_get(main);
         std::map<char *, int, cmp_str> wordMap;
@@ -126,6 +128,7 @@ public:
         kv->put(c3, out);
     }
 
+//    TLDR. This is a reducer
     void summarizer() {
         DataFrame* c1DF = kv->wait_and_get(c1);
         DataFrame* c2DF = kv->wait_and_get(c2);
@@ -134,13 +137,13 @@ public:
 
         std::map<char *, int, cmp_str> wordMap;
         for(size_t i=0; i< c1DF->nrows(); ++i) {
-            wordMap[c1DF->get_string(0, i)->cstr_] += 1;
+            wordMap[c1DF->get_string(0, i)->cstr_] += c1DF->get_int(1, i);
         }
         for(size_t i=0; i< c2DF->nrows(); ++i) {
-            wordMap[c2DF->get_string(0, i)->cstr_] += 1;
+            wordMap[c2DF->get_string(0, i)->cstr_] += c2DF->get_int(1, i);
         }
         for(size_t i=0; i< c3DF->nrows(); ++i) {
-            wordMap[c3DF->get_string(0, i)->cstr_] += 1;
+            wordMap[c3DF->get_string(0, i)->cstr_] += c3DF->get_int(1, i);
         }
 
 //        https://stackoverflow.com/a/26282004/13221681
@@ -156,11 +159,15 @@ public:
 };
 
 int main(int argc, char *argv[]) {
-
-    Demo* reader = new Demo(0, "127.0.0.2");
+// init map
+    Demo* reader = new Demo(0, "127.0.0.2");\
+//    map1
     Demo* counter1 = new Demo(1, "127.0.0.3");
+//    map2
     Demo* counter2 = new Demo(2, "127.0.0.4");
+//    map3
     Demo* counter3 = new Demo(3, "127.0.0.5");
+//    reducer
     Demo* summarizer = new Demo(4, "127.0.0.6");
     reader->run_();
     std::thread t1 = std::thread(&Demo::run_, counter1);

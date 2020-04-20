@@ -657,7 +657,10 @@ void KVStore::put(Key &k, DataFrame *df) {
                 DELIMITER).c(df->serialize_object());
         client_->sendMessage(buff.get());
     } else {
+        pthread_mutex_lock(&mutex);
         map.insert(std::pair<std::string, DataFrame *>(k.keyString_, df));
+        pthread_mutex_unlock(&mutex);
+
     }
 }
 
@@ -683,11 +686,13 @@ void KVStore::use(char *msg) {
         tok = multi_tok(nullptr, &s, DELIMITER);
         Key k = Key(tok, to);
         StrBuff buff = StrBuff();
+        pthread_mutex_lock(&mutex);
         if ( map.find(tok) == map.end() ) {
             buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("BAD").c(DELIMITER).c(tok);
         } else {
             buff.c("MSG ").c(idx_).c(DELIMITER).c(from).c(DELIMITER).c("RES").c(DELIMITER).c(get(k)->serialize_object());
         }
+        pthread_mutex_unlock(&mutex);
         client_->sendMessage(buff.get());
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, &s, DELIMITER);

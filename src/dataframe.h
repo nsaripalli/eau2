@@ -698,6 +698,7 @@ void KVStore::use(char *msg) {
 }
 
 void KVStore::getAgain(Key k) {
+    sleep(1);
     DataFrame *df = dfq.front();
     dfq.pop();
     dfq.push(df);

@@ -4,7 +4,7 @@ build:
 	g++ -o wc -std=c++11 -Wall -g tests/WordCount.cpp -lpthread
 	g++ -o bench -std=c++11 -Wall -g tests/bench.cpp -lpthread
 	g++ -o test -std=c++11 -Wall -g tests/testSerialization.cpp -lpthread
-	g++ -o ddf -std=c++11 -Wall -g tests/testingDistributedDataFrame.cpp -lpthread 
+	g++ -o ddf -std=c++11 -Wall -g tests/distributedDataFrameTests.cpp -lpthread 
 	g++ -o app -std=c++11 -Wall -g tests/application_test.cpp -lpthread
 	g++ -o linus -std=c++11 -Wall -g tests/linus.cpp -lpthread
 	g++ -o personal -std=c++11 -Wall -g tests/personal_test_suite.cpp -lpthread

@@ -2,6 +2,7 @@
 
 #include "metaArray.h"
 #include "../primatives/string.h"
+#include "../primatives/strBuff.h"
 
 /*
  * StringMetaArray ::
@@ -94,15 +95,15 @@ public:
     }
 
     Serialized serialize_object() {
-        StrBuff interalBuffer;
+        StrBuff internalBuffer;
         for (size_t i = 0; i < this->nextIndex_; i++) {
             Serialized curr_col = this->get(i)->serialize_object();
             char schema_size_serailzied[sizeof(size_t)];
             memset(&schema_size_serailzied, 0, sizeof(size_t));
             memcpy(&schema_size_serailzied, &curr_col.size, sizeof(size_t));
 
-            interalBuffer.c(schema_size_serailzied, sizeof(size_t));
-            interalBuffer.c(curr_col);
+            internalBuffer.c(schema_size_serailzied, sizeof(size_t));
+            internalBuffer.c(curr_col);
             delete [] curr_col.data;
         }
 
@@ -111,9 +112,9 @@ public:
         memset(&schema_size_serailzied, 0, sizeof(size_t));
         memcpy(&schema_size_serailzied, &max, sizeof(size_t));
 
-        interalBuffer.c(schema_size_serailzied);
+        internalBuffer.c(schema_size_serailzied);
 
-        return interalBuffer.getSerialization();
+        return internalBuffer.getSerialization();
     }
 
     bool equals(Object *other) override {

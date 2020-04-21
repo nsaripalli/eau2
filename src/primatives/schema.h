@@ -44,6 +44,17 @@ public:
         }
     }
 
+    /** Create a schema from a string of types. A string that contains
+      * characters other than those identifying the four type results in
+      * undefined behavior. The argument is external, a nullptr argument is
+      * undefined. **/
+    Schema(const char *types, bool sorUse) : Schema() {
+        assert(sorUse);
+        for (int i = 0; i < strlen(types); i++) {
+            this->column_types->append(types[i]);
+        }
+    }
+
     /** Add a column of the given type and name (can be nullptr), name
       * is external. Names are expectd to be unique, duplicates result
       * in undefined behavior. */

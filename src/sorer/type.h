@@ -8,6 +8,6 @@
 enum Type {
     BOOL,
     INT,
-    DOUBLE,
+    FLOAT,
     STRING
 }; 

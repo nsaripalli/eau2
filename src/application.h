@@ -19,8 +19,8 @@ class Application : public Object {
 public:
   KVStore *kv;
 
-  Application(int idx, const char* ip) {
-    kv = new KVStore(idx, ip, 8080);
+  Application(int idx, const char* ip, pthread_barrier_t wait_barrier) {
+    kv = new KVStore(idx, ip, 8080, wait_barrier);
   }
 
   ~Application() {
@@ -44,7 +44,7 @@ public:
  */
 class Trivial : public Application {
 public:
-  Trivial(int idx, const char* ip) : Application(idx, ip) { assert(idx == 0); } // assumes 0 for M2
+  Trivial(int idx, const char* ip, pthread_barrier_t wait_barrier) : Application(idx, ip, wait_barrier) { assert(idx == 0); } // assumes 0 for M2
   void run_() {
     size_t SZ = 1000*1000;
     int* vals = new int[SZ];

@@ -205,7 +205,7 @@ public:
     Set *uSet; // Linus' collaborators
     Set *pSet; // projects of collaborators
 
-    Linus(size_t idx, const char *ip) : Application(idx, ip) {}
+    Linus(size_t idx, const char *ip, pthread_barrier_t wait_barrier) : Application(idx, ip, wait_barrier) {}
 //    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
 
     /** Compute DEGREES of Linus.  */
@@ -309,16 +309,19 @@ public:
 }; // Linus
 
 int main(int argc, char *argv[]) {
+    pthread_barrier_t   barrier; // the barrier synchronization object
+    pthread_barrier_init (&barrier, nullptr, num_nodes + 1);
+
 // init map
-    Linus *reader = new Linus(0, "127.0.0.2");
+    Linus *reader = new Linus(0, "127.0.0.2", barrier);
 //    map1
-    Linus *counter1 = new Linus(1, "127.0.0.3");
+    Linus *counter1 = new Linus(1, "127.0.0.3", barrier);
 //    map2
-    Linus *counter2 = new Linus(2, "127.0.0.4");
+    Linus *counter2 = new Linus(2, "127.0.0.4", barrier);
 //    map3
-    Linus *counter3 = new Linus(3, "127.0.0.5");
+    Linus *counter3 = new Linus(3, "127.0.0.5", barrier);
 //    reducer
-    Linus *summarizer = new Linus(4, "127.0.0.6");
+    Linus *summarizer = new Linus(4, "127.0.0.6", barrier);
     std::thread r = std::thread(&Linus::run_, reader);
     std::thread t1 = std::thread(&Linus::run_, counter1);
     std::thread t2 = std::thread(&Linus::run_, counter2);

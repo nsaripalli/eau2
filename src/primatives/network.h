@@ -118,7 +118,7 @@ public:
      * Abstraction over socket accept logic for a "server" socket. 
      * NOTE: `Create` must be called first.
      * Produces a non blocking file descriptor of an incoming 
-     * socket connection or -1 if no connection is incoming. 
+     * socket connection or -1 if no connection is incoming.
      */
     int socketAccept() {
         struct sockaddr_in t_ain;
@@ -126,7 +126,6 @@ public:
         int size = sizeof(t_ain);
         int newFD = accept(sockFD, (struct sockaddr *) &t_ain, (socklen_t *) &size);
         int rv = fcntl(newFD, F_SETFL, O_NONBLOCK);
-//        assert(rv != -1);
         return newFD;
     }
 
@@ -267,16 +266,16 @@ public:
     /**
      * Starts the Node in a thread in the background.
      */
-    void bgStart() {
+    void bgStart(pthread_barrier_t wait_barrier) {
         assert(!bg);
-        bg = new std::thread(&Node::start, this);
+        bg = new std::thread(&Node::start, this, wait_barrier);
     }
 
     /**
      * Starts the nodes in the foreground.
      * NOTE: Blocking
      */
-    virtual void start() {
+    virtual void start(pthread_barrier_t wait_barrier) {
         sleep(1);
         while (!done) {
             // accepting connections
@@ -462,7 +461,7 @@ public:
     /**
      * Registers with the server then starts like normal.
      */
-    virtual void start() {
+    virtual void start(pthread_barrier_t wait_barrier) {
         Socket serv = Socket();
         String *serverIP = new String("127.0.0.1"); // Server's "known" address
         int serverPort = 8080;
@@ -470,7 +469,8 @@ public:
         printf("[%s %s] Sending ip: %s...\n", name, ip->c_str(), ip->c_str());
         sock->sendAll(ip, serverFD);
         cds->push_back(serverFD);
-        Node::start();
+        pthread_barrier_wait(&wait_barrier);
+        Node::start(wait_barrier);
     }
 
     /**
@@ -507,6 +507,7 @@ public:
             } else if (strcmp(tok, "MSG") == 0) {
                 // print the message after "MSG "
                  printf("[Client %s] Message Received: \"%s\"\n", ip->c_str(), &(received->c_str()[4]));
+                 fflush(stdout);
                 user_->use(&(received->c_str()[4]));
             } else if (strcmp(tok, "END") == 0) {
                 if (bg) {

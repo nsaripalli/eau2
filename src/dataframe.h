@@ -117,15 +117,15 @@ public:
      * Default constructor, setting the KV store to be on node 0
      * with ip and port 127.0.0.2:8080
      */
-    KVStore() : KVStore(0, "127.0.0.2", 8080) {}
+//    KVStore() : KVStore(0, "127.0.0.2", 8080) {}
 
     /**
      * Creates a KV store associated with node `idx`
      */
-    KVStore(int idx, const char *ip, int port) {
+    KVStore(int idx, const char *ip, int port, pthread_barrier_t wait_barrier) {
         idx_ = idx;
         client_ = new Client(ip, port, this);
-        client_->bgStart();
+        client_->bgStart(wait_barrier);
         sleep(2); // Let everything register
     }
 
@@ -704,6 +704,9 @@ void KVStore::use(char *msg) {
             dfq.front()->mutateToNewData(tok);
             dfq.pop();
         }
+        else {
+            printf("THERE IS A DUPLICATE RESPONSE. ");
+        }
         pthread_mutex_unlock(&mutex);
     } else if (strcmp(tok, "BAD") == 0) { // key string
         tok = multi_tok(nullptr, &s, DELIMITER);
@@ -714,7 +717,7 @@ void KVStore::use(char *msg) {
 }
 
 void KVStore::getAgain(Key k) {
-    sleep(2);
+    sleep(8);
     pthread_mutex_lock(&mutex);
     DataFrame *df = dfq.front();
     dfq.pop();

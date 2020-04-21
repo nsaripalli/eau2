@@ -363,6 +363,7 @@ int testRegularArrays() {
 
     assert(itesting.equals(&deSeralizedI));
 
+    delete[] testSerialization;
     delete[] testSerializationI;
 
     return 0;

@@ -241,6 +241,7 @@ class SorAdapter {
             string file = string(filename);
             Schema* schema = infer_schema(file, from, length);
             df_ = new DataFrame(*schema);
+            delete schema;
             build_DataFrame(file, from, length);
         }
 
@@ -259,6 +260,7 @@ class SorAdapter {
             string file = string(filename);
             Schema* schema = infer_schema(file, from, length);
             df_ = new DistributedDataFrame(*schema, numNodes, kv, uid);
+            delete schema;
             build_DataFrame(file, from, length);
         }
 

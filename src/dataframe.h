@@ -675,6 +675,7 @@ void KVStore::use(char *msg) {
     int to = atoi(tok);
     tok = multi_tok(nullptr, &s, DELIMITER);
     printf("HEADER: %s\n", tok);
+    printf("THIS IDX: %d\n", idx_);
     fflush(stdout);
     if (to != idx_) { return; }
     if (strcmp(tok, "PUT") == 0) { // key string, df
@@ -698,6 +699,7 @@ void KVStore::use(char *msg) {
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, &s, DELIMITER);
         pthread_mutex_lock(&mutex);
+//        TODO if mutex is blank. skip??????
         dfq.front()->mutateToNewData(tok);
         dfq.pop();
         pthread_mutex_unlock(&mutex);

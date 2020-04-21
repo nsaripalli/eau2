@@ -55,11 +55,17 @@ public:
     StrBuff &c(String &s) { return c(s.c_str()); }
 
     StrBuff &c(size_t v) {
-        return c(std::to_string(v).c_str());
+        std::string tmp = std::to_string(v);
+        const char*  str = (tmp.c_str());
+        size_t step = strlen(str);
+        return c(str, step);
     } // Cpp
 
     StrBuff &c(int v) {
-        return c(std::to_string(v).c_str());
+        std::string tmp = std::to_string(v);
+        const char*  str = (tmp.c_str());
+        size_t step = strlen(str);
+        return c(str, step);
     } // Cpp
 
     StrBuff c(Serialized s) {

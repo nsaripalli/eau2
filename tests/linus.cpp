@@ -319,7 +319,7 @@ int main(int argc, char *argv[]) {
     Linus *counter3 = new Linus(3, "127.0.0.5");
 //    reducer
     Linus *summarizer = new Linus(4, "127.0.0.6");
-    reader->run_();
+    std::thread r = std::thread(&Linus::run_, reader);
     std::thread t1 = std::thread(&Linus::run_, counter1);
     std::thread t2 = std::thread(&Linus::run_, counter2);
     std::thread t3 = std::thread(&Linus::run_, counter3);

@@ -55,7 +55,7 @@ public:
     StrBuff &c(String &s) { return c(s.c_str()); }
 
     StrBuff &c(size_t v) {
-        return c(convert_size_to_string(v));
+        return c(std::to_string(v).c_str());
     } // Cpp
 
     StrBuff &c(int v) {
@@ -64,10 +64,6 @@ public:
 
     StrBuff c(Serialized s) {
         return c(s.data, s.size);
-    }
-
-    static const char *convert_size_to_string(size_t v) {
-        return std::to_string(v).c_str();
     }
 
     String *get() {

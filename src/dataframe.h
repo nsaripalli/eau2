@@ -618,6 +618,7 @@ public:
             w->accept(r);
             df->add_row(r);
         }
+        pStore.put(pKey, df);
         return df;
     }
 
@@ -741,10 +742,21 @@ DataFrame *KVStore::get(Key &key) {
 }
 
 DataFrame *KVStore::wait_and_get(Key &key) {
-    DataFrame *df = get(key);
+    if (key.idx_ != idx_) {
+        DataFrame *df = get(key);
+        while (!df->hasBeenMutated);
 //  Bool to indicate if the df has been modified.
-    while (!df->hasBeenMutated);
-    return df;
+        return df;
+    }
+    else {
+        while (map.find(key.keyString_) == map.end()) {
+            sleep(1);
+        }
+        DataFrame *df = map.at(key.keyString_);
+        df->hasBeenMutated = true;
+        return df;
+    }
+
 }
 
 bool DataFrame::equals(Object *other) {

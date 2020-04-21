@@ -20,7 +20,7 @@
  *                    -- and committed by user uid',
  **/
 
-size_t num_nodes = 1;
+size_t num_nodes = 4;
 
 
 /**************************************************************************
@@ -30,15 +30,15 @@ size_t num_nodes = 1;
  ************************************************************************/
 class Set {
 public:
-    bool* vals_;  // owned; data
+    bool *vals_;  // owned; data
     size_t size_; // number of elements
 
     /** Creates a set of the same size as the DataFrame. */
-    Set(DataFrame* df) : Set(df->nrows()) {}
+    Set(DataFrame *df) : Set(df->nrows()) {}
 
     /** Creates a set of the given size. */
-    Set(size_t sz) :  vals_(new bool[sz]), size_(sz) {
-        for(size_t i = 0; i < size_; i++)
+    Set(size_t sz) : vals_(new bool[sz]), size_(sz) {
+        for (size_t i = 0; i < size_; i++)
             vals_[i] = false;
     }
 
@@ -49,7 +49,7 @@ public:
      *  that did not appear in projects or users.
      */
     void set(size_t idx) {
-        if (idx >= size_ ) return; // ignoring out of bound writes
+        if (idx >= size_) return; // ignoring out of bound writes
         vals_[idx] = true;
     }
 
@@ -62,7 +62,7 @@ public:
     size_t size() { return size_; }
 
     /** Performs set union in place. */
-    void union_(Set& from) {
+    void union_(Set &from) {
         for (size_t i = 0; i < from.size_; i++)
             if (from.test(i))
                 set(i);
@@ -75,14 +75,17 @@ public:
  ******************************************************************************/
 class SetUpdater : public Reader {
 public:
-    Set& set_; // set to update
+    Set &set_; // set to update
 
-    SetUpdater(Set& set): set_(set) {}
+    SetUpdater(Set &set) : set_(set) {}
 
     /** Assume a row with at least one column of type I. Assumes that there
      * are no missing. Reads the value and sets the corresponding position.
      * The return value is irrelevant here. */
-    bool accept(Row & row) { set_.set(row.get_int(0));  return false; }
+    bool accept(Row &row) {
+        set_.set(row.get_int(0));
+        return false;
+    }
 
 };
 
@@ -91,20 +94,20 @@ public:
  * DataFrame. The data contains all the values in the set. The DataFrame has
  * at least one integer column.
  ****************************************************************************/
-class SetWriter: public Writer {
+class SetWriter : public Writer {
 public:
-    Set& set_; // set to read from
+    Set &set_; // set to read from
     int i_ = 0;  // position in set
 
-    SetWriter(Set& set): set_(set) { }
+    SetWriter(Set &set) : set_(set) {}
 
-    virtual Object* clone() { 
-        SetWriter* sw = new SetWriter(set_);
+    virtual Object *clone() {
+        SetWriter *sw = new SetWriter(set_);
         sw->i_ = i_;
         return sw;
     }
 
-    void join_delete(Rower* other) {
+    void join_delete(Rower *other) {
         delete other;
     }
 
@@ -114,7 +117,7 @@ public:
         return i_ == set_.size_;
     }
 
-    bool accept(Row & row) { 
+    bool accept(Row &row) {
         row.set(0, i_++);
         return true;
     }
@@ -132,17 +135,17 @@ public:
  *************************************************************************/
 class ProjectsTagger : public Reader {
 public:
-    Set& uSet; // set of collaborator
-    Set& pSet; // set of projects of collaborators
+    Set &uSet; // set of collaborator
+    Set &pSet; // set of projects of collaborators
     Set newProjects;  // newly tagged collaborator projects
 
-    ProjectsTagger(Set& uSet, Set& pSet, DataFrame* proj):
+    ProjectsTagger(Set &uSet, Set &pSet, DataFrame *proj) :
             uSet(uSet), pSet(pSet), newProjects(proj) {}
 
     /** The data frame must have at least two integer columns. The newProject
      * set keeps track of projects that were newly tagged (they will have to
      * be communicated to other nodes). */
-    bool accept(Row & row) override {
+    bool accept(Row &row) override {
         int pid = row.get_int(0);
         int uid = row.get_int(1);
         if (uSet.test(uid))
@@ -164,18 +167,18 @@ public:
  *************************************************************************/
 class UsersTagger : public Reader {
 public:
-    Set& pSet;
-    Set& uSet;
+    Set &pSet;
+    Set &uSet;
     Set newUsers;
 
-    UsersTagger(Set& pSet,Set& uSet, DataFrame* users):
-            pSet(pSet), uSet(uSet), newUsers(users->nrows()) { }
+    UsersTagger(Set &pSet, Set &uSet, DataFrame *users) :
+            pSet(pSet), uSet(uSet), newUsers(users->nrows()) {}
 
-    bool accept(Row & row) override {
+    bool accept(Row &row) override {
         int pid = row.get_int(0);
         int uid = row.get_int(1);
         if (pSet.test(pid))
-            if(!uSet.test(uid)) {
+            if (!uSet.test(uid)) {
                 uSet.set(uid);
                 newUsers.set(uid);
             }
@@ -190,19 +193,19 @@ public:
  **************************************************************************/
 class Linus : public Application {
 public:
-    int DEGREES = 1;  // How many degrees of separation form linus?
-//    int DEGREES = 4;  // How many degrees of separation form linus?
+//    int DEGREES = 1;  // How many degrees of separation form linus?
+    int DEGREES = 4;  // How many degrees of separation form linus?
     int LINUS = 4967;   // The uid of Linus (offset in the user df)
-    const char* PROJ = "datasets/projects.ltgt";
-    const char* USER = "datasets/users.ltgt";
-    const char* COMM = "datasets/commits.ltgt";
-    DataFrame* projects; //  pid x project name
-    DataFrame* users;  // uid x user name
-    DataFrame* commits;  // pid x uid x uid
-    Set* uSet; // Linus' collaborators
-    Set* pSet; // projects of collaborators
+    const char *PROJ = "datasets/projects.ltgt";
+    const char *USER = "datasets/users.ltgt";
+    const char *COMM = "datasets/commits.ltgt";
+    DataFrame *projects; //  pid x project name
+    DataFrame *users;  // uid x user name
+    DataFrame *commits;  // pid x uid x uid
+    Set *uSet; // Linus' collaborators
+    Set *pSet; // projects of collaborators
 
-    Linus(size_t idx, const char* ip): Application(idx, ip) {}
+    Linus(size_t idx, const char *ip) : Application(idx, ip) {}
 //    TODO CURRENTLY ALL KEY VALUES ARE STORED ON NODE ONE
 
     /** Compute DEGREES of Linus.  */
@@ -233,9 +236,9 @@ public:
 //            delete?
             DataFrame::fromScalar(new Key("users-0-0"), kv, LINUS);
         } else {
-            projects = dynamic_cast<DataFrame*>(kv->wait_and_get(pK));
-            users = dynamic_cast<DataFrame*>(kv->wait_and_get(uK));
-            commits = dynamic_cast<DataFrame*>(kv->wait_and_get(cK));
+            projects = dynamic_cast<DataFrame *>(kv->wait_and_get(pK));
+            users = dynamic_cast<DataFrame *>(kv->wait_and_get(uK));
+            commits = dynamic_cast<DataFrame *>(kv->wait_and_get(cK));
         }
         uSet = new Set(users);
         pSet = new Set(projects);
@@ -247,9 +250,9 @@ public:
     void step(int stage) {
         p("Stage ").pln(stage);
         // Key of the shape: users-stage-0
-        Key uK(StrBuff("users-").c(stage).c("-0").get()->c_str());
+        Key uK(StrBuff("users-").c(stage).c("-0").get()->c_str(), stage);
         // A df with all the users added on the previous round
-        DataFrame* newUsers = kv->wait_and_get(uK);
+        DataFrame *newUsers = kv->wait_and_get(uK);
         Set delta(users);
         SetUpdater upd(delta);
         newUsers->map(upd); // all of the new users are copied to delta.
@@ -273,11 +276,11 @@ public:
      * 'users' or 'projects', stage is the degree of separation being
      * computed.
      */
-    void merge(Set& set, char const* name, int stage) {
+    void merge(Set &set, char const *name, int stage) {
         if (this_node() == 0) {
             for (size_t i = 1; i < num_nodes; ++i) {
-                Key nK(StrBuff(name).c(stage).c("-").c(i).get()->c_str());
-                DataFrame* delta = kv->wait_and_get(nK);
+                Key nK(StrBuff(name).c(stage).c("-").c(i).get()->c_str(), i);
+                DataFrame *delta = kv->wait_and_get(nK);
                 p("    received delta of ").p(delta->nrows())
                         .p(" elements from node ").pln(i);
                 SetUpdater upd(set);
@@ -286,17 +289,17 @@ public:
             }
             p("    storing ").p(set.size()).pln(" merged elements");
             SetWriter writer(set);
-            Key k(StrBuff(name).c(stage).c("-0").get()->c_str());
+            Key k(StrBuff(name).c(stage).c("-0").get()->c_str(), this->this_node());
 //            delete
             DataFrame::fromVisitor(k, *kv, "I", writer);
         } else {
             p("    sending ").p(set.size()).pln(" elements to master node");
             SetWriter writer(set);
-            Key k(StrBuff(name).c(stage).c("-").c(this->this_node()).get()->c_str());
+            Key k(StrBuff(name).c(stage).c("-").c(this->this_node()).get()->c_str(), this->this_node());
 //            delete
-             DataFrame::fromVisitor(k, *kv, "I", writer);
-            Key mK(StrBuff(name).c(stage).c("-0").get()->c_str());
-            DataFrame* merged = kv->wait_and_get(mK);
+            DataFrame::fromVisitor(k, *kv, "I", writer);
+            Key mK(StrBuff(name).c(stage).c("-0").get()->c_str(), stage);
+            DataFrame *merged = kv->wait_and_get(mK);
             p("    receiving ").p(merged->nrows()).pln(" merged elements");
             SetUpdater upd(set);
             merged->map(upd);
@@ -305,8 +308,32 @@ public:
     }
 }; // Linus
 
-int main() {
-    Linus* producer = new Linus(0, "127.0.0.2");
-    producer->run_();
-    while(!producer->done());
+int main(int argc, char *argv[]) {
+// init map
+    Linus *reader = new Linus(0, "127.0.0.2");
+//    map1
+    Linus *counter1 = new Linus(1, "127.0.0.3");
+//    map2
+    Linus *counter2 = new Linus(2, "127.0.0.4");
+//    map3
+    Linus *counter3 = new Linus(3, "127.0.0.5");
+//    reducer
+    Linus *summarizer = new Linus(4, "127.0.0.6");
+    reader->run_();
+    std::thread t1 = std::thread(&Linus::run_, counter1);
+    std::thread t2 = std::thread(&Linus::run_, counter2);
+    std::thread t3 = std::thread(&Linus::run_, counter3);
+    std::thread t4 = std::thread(&Linus::run_, summarizer);
+    sleep(5);
+    while (!reader->done());
+    while (!counter1->done());
+    while (!counter2->done());
+    while (!counter3->done());
+    while (!summarizer->done());
+    t1.join();
+    t2.join();
+    t3.join();
+    t4.join();
+
+    return 0;
 }

@@ -30,6 +30,9 @@ public:
     virtual char* c_str() { return nullptr; }
 };
 
+// This is a struct that is a serialized version of a data structure and the size of the serialized string
+// A serialized string should know how much to read in and should self terminate.
+// The format of the serialized string is up to the class that is serializing itself
 struct Serialized {
     size_t size;
     char* data;

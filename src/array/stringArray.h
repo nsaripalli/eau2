@@ -148,6 +148,7 @@ public:
     }
 
 
+//    The format of this output is essentially a linked list of strings
     Serialized serialize_object() {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {

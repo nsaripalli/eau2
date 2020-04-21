@@ -171,7 +171,7 @@ public:
         return this->internal_array->equals(s->internal_array);
     }
 
-
+//    The format of this output is essentially a linked list of columns
     Serialized serialize_object() override {
         StrBuff interalBuffer;
         for (size_t i = 0; i < this->length(); i++) {

@@ -328,7 +328,7 @@ public:
 
     virtual void set(size_t col, size_t row, double val) {
         FloatColumn *selectedColumn = this->columns->get(col)->as_float();
-        selectedColumn->set(row, val);
+        selectedColumn->set(row, (float)val);
     }
 
     virtual void set(size_t col, size_t row, float val) {

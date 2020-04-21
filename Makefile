@@ -3,6 +3,7 @@ build:
 	g++ -o m3 -std=c++11 -Wall -g tests/m3.cpp -lpthread
 	g++ -o wc -std=c++11 -Wall -g tests/WordCount.cpp -lpthread
 	g++ -o bench -std=c++11 -Wall -g tests/bench.cpp -lpthread
+	g++ -o sor -std=c++11 -Wall -g tests/testSor.cpp -lpthread
 	g++ -o test -std=c++11 -Wall -g tests/testSerialization.cpp -lpthread
 	g++ -o ddf -std=c++11 -Wall -g tests/distributedDataFrameTests.cpp -lpthread 
 	g++ -o app -std=c++11 -Wall -g tests/application_test.cpp -lpthread
@@ -21,8 +22,8 @@ basic-test:
 	./test
 	./bench
 	./personal
-	./app
 	./ddf
+	./sor
 
 test:
 	./test

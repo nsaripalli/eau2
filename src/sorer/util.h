@@ -21,15 +21,28 @@ int parse_int(string value) {
 }
 
 /**
- * Convenience wrapper around stod, returns a double from a string
+ * Convenience wrapper around stod, returns a FLOAT from a string
  * @param s The string to be parsed
- * @return parsed double
+ * @return parsed FLOAT
  */
 double parse_double(string value) {
     if (value == "") {
         return NULL;
     } else {
         return stod(value);
+    }
+}
+
+/**
+ * Convenience wrapper around stof, returns a float from a string
+ * @param s The string to be parsed
+ * @return parsed float
+ */
+float parse_float(string value) {
+    if (value == "") {
+        return NULL;
+    } else {
+        return stof(value);
     }
 }
 
@@ -81,9 +94,9 @@ bool is_int(string value) {
 }
 
 /**
- * Is the string is a double
+ * Is the string is a FLOAT
  * @param s The string to be evaluated
- * @return bool if the string is a double
+ * @return bool if the string is a FLOAT
  */
 bool is_double(string value) {
     if (value.find("\"")  != string::npos) {
@@ -158,7 +171,7 @@ Type get_field_type(string fieldValue) {
     trim_whitespace(fieldValue);
     if (is_bool(fieldValue)) return BOOL;
     if (is_int(fieldValue)) return INT;
-    if (is_double(fieldValue)) return DOUBLE;
+    if (is_double(fieldValue)) return FLOAT;
     if (is_string(fieldValue)) return STRING;
     return BOOL;
 }
@@ -186,8 +199,8 @@ Type map_to_type(char type) {
         case 'S':
             return STRING;
             break;
-        case 'D':
-            return DOUBLE;
+        case 'F':
+            return FLOAT;
             break;
         case 'I':
             return INT;
@@ -209,8 +222,8 @@ char map_to_char(Type type) {
             return 'B';
         case STRING:
             return 'S';
-        case DOUBLE:
-            return 'D';
+        case FLOAT:
+            return 'F';
         case INT:
             return 'I';
         default:

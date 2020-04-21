@@ -46,6 +46,13 @@ class Parser {
          */
         Parser(unsigned int length, DataFrame* df_) : Parser(length) {
             infer_only = (df_ == nullptr);
+            if (!infer_only) {
+                vector<char> temp;
+                for (int i = 0; i < df_->ncols(); i++) {
+                    temp.push_back(df_->schema->col_type(i));
+                }
+                type_vector = temp;
+            }
             df = df_;
         }
 
@@ -75,8 +82,8 @@ class Parser {
                         case 'B':
                             df->set(i, line_count, parse_bool(current_field));
                             break;
-                        case 'D':
-                            df->set(i, line_count, parse_double(current_field));
+                        case 'F':
+                            df->set(i, line_count, parse_float(current_field));
                             break;
                         case 'S':
                             df->set(i, line_count, parse_string(current_field));
@@ -174,7 +181,7 @@ class Parser {
 
         /**
          * Updates the type of this Column if the incomingType is less restrictive than the currentType
-         * I.e. STRING replaces DOUBLE replaces INT replaces BOOL
+         * I.e. STRING replaces FLOAT replaces INT replaces BOOL
          * @param old_type The type that wa previosuly present
          * @param new_type The type that may replace this column's current Type
          */
@@ -265,9 +272,8 @@ class SorAdapter {
             // Used to keep track of the current state of parsing
             Parser* p = new Parser(length, nullptr);
             p->read_file(fin);
-
             char* types = p->types();
-            Schema* schema = new Schema(types);
+            Schema* schema = new Schema(types, true);
             delete[] types;
             delete p;
             return schema;

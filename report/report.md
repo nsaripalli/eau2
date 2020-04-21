@@ -112,7 +112,6 @@ As of 3/30:
 As of 4/6:
 
   - The distributed kv store correctly seriales and deserializes data frames
-  
 
   - The kv store has a working wait and get for existing keys
 
@@ -150,3 +149,13 @@ As of 4/13
   you want to run (like linus). Then, run the server with "-ip 127.0.0.1".
   Next, run the client you chose (in a seperate shell/terminal). When the client
   has completed, press enter on the server session to initiate graceful shutdown.
+
+As of 4/22
+
+  - Word Count is fully demonstrable
+
+  - Sorer is tested and up to date for complex data files
+
+  - Documentation has been increased
+
+  - Wait_and_get is more robust, now capable of waiting on local keys

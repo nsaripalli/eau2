@@ -117,7 +117,6 @@ public:
 
     //    For eventual caching.
     virtual void add_column(Column *col, String *name) {
-//        TODO do this
     }
 
     virtual int get_int(size_t col, size_t row) {

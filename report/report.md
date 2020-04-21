@@ -150,3 +150,6 @@ As of 4/13
   you want to run (like linus). Then, run the server with "-ip 127.0.0.1".
   Next, run the client you chose (in a seperate shell/terminal). When the client
   has completed, press enter on the server session to initiate graceful shutdown.
+
+
+TODO DOCS ON SERIALIZATION AND DDF

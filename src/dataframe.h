@@ -699,9 +699,11 @@ void KVStore::use(char *msg) {
     } else if (strcmp(tok, "RES") == 0) { // df
         tok = multi_tok(nullptr, &s, DELIMITER);
         pthread_mutex_lock(&mutex);
-//        TODO if mutex is blank. skip??????
-        dfq.front()->mutateToNewData(tok);
-        dfq.pop();
+//        This means we've already gotten a response. How? If I knew I wouldn't be writing this comment.
+        if (!dfq.empty()) {
+            dfq.front()->mutateToNewData(tok);
+            dfq.pop();
+        }
         pthread_mutex_unlock(&mutex);
     } else if (strcmp(tok, "BAD") == 0) { // key string
         tok = multi_tok(nullptr, &s, DELIMITER);

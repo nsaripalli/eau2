@@ -76,6 +76,10 @@ public:
         return column_types->serialize_object();
     }
 
+    /**
+     * Returns true if the other object is a schema with the 
+     * same types in the same order as this schema
+     */
     bool equals(Object *other) override {
         if (other == nullptr) return false;
         Schema *s = dynamic_cast<Schema*>(other);
